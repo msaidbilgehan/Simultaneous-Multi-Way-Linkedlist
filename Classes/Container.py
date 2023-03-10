@@ -174,7 +174,7 @@ class Container_Struct(object):
             # Check if there is a new thread in waiting thread cache
             # if len(waiting_node_cache):
             #     print("waiting_node_cache last id", waiting_node_cache[-1][-1].id, "LEN:", len(waiting_node_cache))
-            with ThreadPoolExecutor(max_workers=1000) as executor:
+            with ThreadPoolExecutor(max_workers=self.get_Max_Workers()) as executor:
                 # Search in connected nodes
                 while self.__search_Thread_Active:
                     local_waiting_node_cache = list()

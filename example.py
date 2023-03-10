@@ -36,9 +36,9 @@ print("=== Initialize ===")
 number_of_max_worker = 100
 
 seed(time())
-searched_data = -13 # randint(0, 100)
-node_length = 3  # randint(0, 10000) or cpu_count() * 100
-search_node_index = node_length - randint(1, node_length-1)
+SEARCHED_DATA = -13 # randint(0, 100)
+NODE_LENGTH = 3  # randint(0, 10000) or cpu_count() * 100
+SEARCHED_NODE_INDEX = NODE_LENGTH - randint(1, NODE_LENGTH-1)
 
 # Create a container
 container = Container_Struct(number_of_max_worker)
@@ -46,12 +46,12 @@ container = Container_Struct(number_of_max_worker)
 
 print("Max Workers:", container.get_Max_Workers())
 
-# Create node_length node layers
-node_layer_1 = container.create_Node(int(node_length/2))
-node_layer_2 = container.create_Node(node_length)
-node_layer_3 = container.create_Node(node_length*2)
-node_layer_4 = container.create_Node(node_length)
-node_layer_last = container.create_Node(node_length)
+# Create NODE_LENGTH node layers
+node_layer_1 = container.create_Node(int(NODE_LENGTH/2))
+node_layer_2 = container.create_Node(NODE_LENGTH)
+node_layer_3 = container.create_Node(NODE_LENGTH*2)
+node_layer_4 = container.create_Node(NODE_LENGTH)
+node_layer_last = container.create_Node(NODE_LENGTH)
 
 layer_list = [
     node_layer_1, 
@@ -88,16 +88,16 @@ for layer in layer_list:
     print("Layer Length:", len(layer))
 
 print()
-node_layer_last[search_node_index].set_Data(searched_data)
+node_layer_last[SEARCHED_NODE_INDEX].set_Data(SEARCHED_DATA)
 print(
-    f"node_layer_last[{search_node_index}] (id is {node_layer_last[search_node_index].id}) contains {node_layer_last[search_node_index].get_Data()}"
+    f"node_layer_last[{SEARCHED_NODE_INDEX}] (id is {node_layer_last[SEARCHED_NODE_INDEX].id}) contains {node_layer_last[SEARCHED_NODE_INDEX].get_Data()}"
 )
-print(f"Looking for data: {searched_data}")
+print(f"Looking for data: {SEARCHED_DATA}")
 
 print("===== Sequential Search =====")
 # get the start time
 start_time = time()
-result_queue = container.search(searched_data)
+result_queue = container.search(SEARCHED_DATA)
 end_time = time()
 
 elapsed_time = end_time - start_time
@@ -117,7 +117,7 @@ print("Path Length:", len(result_queue))
 print("===== Multi-Threaded Search =====")
 
 start_time = time()
-found_node_list = container.search_Task(searched_data)
+found_node_list = container.search_Task(SEARCHED_DATA)
 end_time = time()
 elapsed_time = end_time - start_time
 print('Execution time:', elapsed_time, 'seconds')

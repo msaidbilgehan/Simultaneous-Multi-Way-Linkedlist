@@ -17,6 +17,8 @@ class Container_Struct(object):
         self.input_Gate = Gate_Struct()
         self.output_Gate = Gate_Struct()
         
+        self.__node_array_map = list()
+        self.__node_id_array_map = list()
         self.__node_List = list()
         self.__search_History = Search_History_List_Struct()
         self.__search_Data = None
@@ -26,7 +28,7 @@ class Container_Struct(object):
         self.__search_Thread_Active = True
         # self.__active_Thread_Cache = list()
         self.__search_Producer_Thread = Thread(
-            target=self.__search_Producer_Task,
+            target=self.__search_Task,
             args=[
                 self.__waiting_Node_Cache
             ]
@@ -57,7 +59,7 @@ class Container_Struct(object):
         self.__search_Producer_Thread.join()
 
         self.__search_Producer_Thread = Thread(
-            target=self.__search_Producer_Task,
+            target=self.__search_Task,
             args=[
                 self.__waiting_Node_Cache
             ]
@@ -87,6 +89,24 @@ class Container_Struct(object):
         self.__node_List[index].connect_To_Node(self.output_Gate)
         return 1
 
+    def create_Node_Map(self, node_layers):
+        self.__node_array_map.append([self.input_Gate])
+        for node_layer in node_layers:
+            self.__node_array_map.append(node_layer)
+        self.__node_array_map.append([self.output_Gate])
+    
+    def create_Node_ID_Map(self, node_layers):
+        self.__node_id_array_map.append([self.input_Gate.id])
+        for node_layer in node_layers:
+            self.__node_id_array_map.append([node.id for node in node_layer])
+        self.__node_id_array_map.append([self.output_Gate.id])
+    
+    def get_Node_Map(self):
+        return self.__node_array_map
+    
+    def get_Node_ID_Map(self):
+        return self.__node_id_array_map
+    
     def connect_Node_Layers(self, node_layer_1, node_layer_2) -> int:
         counter_connections = 0
         for layer_1_node in node_layer_1:
@@ -147,7 +167,7 @@ class Container_Struct(object):
             raise Exception("Node number must be greater than 2")
             return 0
 
-    def __search_Producer_Task(self, waiting_node_cache):
+    def __search_Task(self, waiting_node_cache):
         while self.__search_Thread_Active:
             result_list = list()
             
@@ -198,14 +218,6 @@ class Container_Struct(object):
                     waiting_node_cache += local_waiting_node_cache
                     
                     sleep(0.01)
-
-    # def __search_Consumer_Task(self, active_thread_cache):
-    #     while True:
-    #         # Check if there is a new thread in active thread cache
-    #         for active_thread in active_thread_cache:
-    #             active_thread.join()
-    #             sleep(0.1)
-    #         sleep(0.1)
 
     def search_Task(self, data, wait_For_First_Output_Gate=True):
         self.__search_Data = data

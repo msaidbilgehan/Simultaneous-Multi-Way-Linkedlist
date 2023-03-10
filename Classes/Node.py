@@ -11,7 +11,7 @@ class Node_Struct(object):
     id_Counter = 0
     # thread_Limit = cpu_count() * 100
 
-    def __init__(self, data=None, connections=None, is_Node_Blocked=False, task_Sleep_Time=0):
+    def __init__(self, data=None, connections=None, is_Node_Blocked=False):
 
         # Self Checker
         if connections is not None:
@@ -32,9 +32,6 @@ class Node_Struct(object):
         
         # Exit Statement for Threading
         self.exit_Statement = False
-        
-        # Process Time (in seconds)
-        self.task_Sleep_Time = task_Sleep_Time
         
         # To ensure there will be no rise condition between threads at searching (DO NOT USE DIRECTLY)
         self.__lock = Lock()
@@ -126,4 +123,12 @@ class Node_Struct(object):
             return [None]
         else:
             return [None]
+        
+    def get_information(self):
+        return {
+            "ID": self.id,
+            "Blocked_Status": self.get_Blocked_Status(),
+            "Data": self.get_Data(),
+            "Connected_Node_List": self.get_Connected_Node_List(),
+        }
         

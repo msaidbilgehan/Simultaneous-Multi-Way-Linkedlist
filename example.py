@@ -33,7 +33,7 @@ def load_from_json(path):
 
 print("")
 print("=== Initialize ===")
-NUMBER_OF_MAX_WORKERS = 100
+NUMBER_OF_MAX_WORKERS = 1000
 
 seed(time())
 SEARCHED_DATA = -13 # randint(0, 100)

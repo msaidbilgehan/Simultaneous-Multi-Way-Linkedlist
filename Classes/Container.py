@@ -10,7 +10,7 @@ from Classes.Search_History import Search_History_List_Struct
 class Container_Struct(object):
     id_counter = 0
 
-    def __init__(self):
+    def __init__(self, max_workers=None):
 
         self.id = self.id_counter
         
@@ -22,7 +22,8 @@ class Container_Struct(object):
         self.__search_Data = None
         self.__found_Node_List = list()
         self.__waiting_Node_Cache = list()
-        self.__max_Workers = None
+        self.__max_Workers = max_workers
+        self.__search_Thread_Active = True
         # self.__active_Thread_Cache = list()
         self.__search_Producer_Thread = Thread(
             target=self.__search_Producer_Task,
@@ -41,7 +42,7 @@ class Container_Struct(object):
         # self.__search_Consumer_Thread.start()
 
     # https://stackoverflow.com/questions/674304/why-is-init-always-called-after-new
-    def __new__(cls, *args, **kwargs):
+    def __new__(cls, max_workers=None, *args, **kwargs):
         # Node ID
         # cls.id_counter += 1
         Container_Struct.id_counter += 1
@@ -49,6 +50,23 @@ class Container_Struct(object):
     
     def set_Max_Workers(self, max_Workers):
         self.__max_Workers = max_Workers
+        self.restart_Search_Thread()
+        
+    def restart_Search_Thread(self):
+        self.__search_Thread_Active = False
+        self.__search_Producer_Thread.join()
+
+        self.__search_Producer_Thread = Thread(
+            target=self.__search_Producer_Task,
+            args=[
+                self.__waiting_Node_Cache
+            ]
+        )
+        self.__search_Producer_Thread.setDaemon(True)  # don't hang on exit
+        self.__search_Thread_Active = True
+
+        self.__search_Producer_Thread.start()
+        
         
     def get_Max_Workers(self):
         return self.__max_Workers
@@ -61,29 +79,42 @@ class Container_Struct(object):
         self.__node_List += node_list
         return node_list
     
-    def connect_to_Input_Gate(self, index):
+    def connect_to_Input_Gate(self, index) -> int:
         self.input_Gate.connect_To_Node(self.__node_List[index])
+        return 1
     
-    def connect_to_Output_Gate(self, index):
+    def connect_to_Output_Gate(self, index) -> int:
         self.__node_List[index].connect_To_Node(self.output_Gate)
+        return 1
 
-    def connect_Node_Layers(self, node_layer_1, node_layer_2):
+    def connect_Node_Layers(self, node_layer_1, node_layer_2) -> int:
+        counter_connections = 0
         for layer_1_node in node_layer_1:
             for layer_2_node in node_layer_2:
                 layer_1_node.connect_To_Node(layer_2_node)
+                counter_connections += 1
+        return counter_connections
 
-    def connect_Input_Gate_to_Node_Layer(self, node_layer):
+    def connect_Input_Gate_to_Node_Layer(self, node_layer) -> int:
+        counter_connections = 0
         for node in node_layer:
             self.input_Gate.connect_To_Node(node)
+            counter_connections += 1
+        return counter_connections
 
-    def connect_Node_Layer_To_Output_Gate(self, node_layer):
+    def connect_Node_Layer_To_Output_Gate(self, node_layer) -> int:
+        counter_connections = 0
         for node in node_layer:
             node.connect_To_Node(self.output_Gate)
+            counter_connections += 1
+        return counter_connections
 
     def connect_To_Custom_Node_List(self, node_list, input_Gate_Index, output_Gate_Index):
+        counter_connections = 0
         self.__node_List = node_list
-        self.connect_to_Input_Gate(input_Gate_Index)
-        self.connect_to_Output_Gate(output_Gate_Index)
+        counter_connections += self.connect_to_Input_Gate(input_Gate_Index)
+        counter_connections += self.connect_to_Output_Gate(output_Gate_Index)
+        return counter_connections
         
     def get_Struct(self):
         return self.__node_List, self.input_Gate, self.output_Gate
@@ -98,28 +129,34 @@ class Container_Struct(object):
                 blocked_Node_Number += 1
         return blocked_Node_Number
     
-    def connect_Node_As_Ordered(self):
+    def connect_Node_As_Ordered(self) -> int:
+        counter_connections = 0
         if len(self.__node_List) > 2:
-            self.connect_to_Input_Gate(0)
-            self.connect_to_Output_Gate(len(self.__node_List) - 1)
+            counter_connections += self.connect_to_Input_Gate(0)
+            counter_connections += self.connect_to_Output_Gate(
+                len(self.__node_List) - 1
+            )
             # debug_node = None
             for i in range(0, len(self.__node_List) - 1):
                 # print(i, self.__node_List[i].id)
                 self.__node_List[i].connect_To_Node(self.__node_List[i + 1])
+                counter_connections += 1
                 # debug_node = self.__node_List[i]
+            return counter_connections
         else:
             raise Exception("Node number must be greater than 2")
+            return 0
 
     def __search_Producer_Task(self, waiting_node_cache):
-        while True:
+        while self.__search_Thread_Active:
             result_list = list()
             
             # Check if there is a new thread in waiting thread cache
             # if len(waiting_node_cache):
             #     print("waiting_node_cache last id", waiting_node_cache[-1][-1].id, "LEN:", len(waiting_node_cache))
-            with ThreadPoolExecutor(max_workers=self.__max_Workers) as executor:
+            with ThreadPoolExecutor(max_workers=1000) as executor:
                 # Search in connected nodes
-                while True:
+                while self.__search_Thread_Active:
                     local_waiting_node_cache = list()
                     local_thread_list = list()
 
@@ -199,7 +236,7 @@ class Container_Struct(object):
         result_list = list()
         search_history = Search_History_List_Struct()
         
-        with ThreadPoolExecutor(max_workers=None) as executor:
+        with ThreadPoolExecutor(max_workers=self.get_Max_Workers()) as executor:
             # Search in connected nodes
             for node in self.input_Gate.get_Connected_Node_List():
                 # Start a thread for each node

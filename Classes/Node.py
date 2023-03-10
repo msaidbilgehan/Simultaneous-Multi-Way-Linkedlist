@@ -4,7 +4,7 @@
 
 from concurrent.futures import ThreadPoolExecutor
 from threading import Lock, Thread
-from time import sleep
+# from time import sleep
 # from multiprocessing import cpu_count
 
 class Node_Struct(object):
@@ -127,17 +127,3 @@ class Node_Struct(object):
         else:
             return [None]
         
-    def do_I_Have_Isolated_Thread(self, node_path, data, node_cache, recursive=True) -> list:
-        if self._data == data:
-            node_path.append(self)
-            return node_path
-
-        elif recursive:
-            # Search in connected nodes
-            for node in self.connected_Node_List:
-                node_cache.append(
-                    [self, node]
-                )
-            return [None]
-        else:
-            return [None]

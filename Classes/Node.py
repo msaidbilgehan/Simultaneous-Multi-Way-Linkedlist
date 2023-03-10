@@ -24,6 +24,7 @@ class Node_Struct(object):
             self.connected_Node_List = list()
         
         self._data = data
+        self._is_Data_Checked = False
         
         self.id = self.id_Counter
         
@@ -81,6 +82,12 @@ class Node_Struct(object):
     
     def compare_Data_Aware(self, data) -> list:
         return [self._data == data, self]
+    
+    def set_Is_Data_Checked(self, bool):
+        self._is_Data_Checked = bool
+    
+    def is_Data_Checked(self):
+        return self._is_Data_Checked
     
     def do_I_Have(self, data, search_history, recursive=True) -> list:
         if self._data == data:

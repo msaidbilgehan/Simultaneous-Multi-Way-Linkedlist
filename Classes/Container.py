@@ -10,7 +10,7 @@ from Classes.Search_History import Search_History_List_Struct
 class Container_Struct(object):
     id_counter = 0
 
-    def __init__(self, max_workers=None):
+    def __init__(self, max_workers=None, do_not_check_again=True):
 
         self.id = self.id_counter
         
@@ -22,6 +22,7 @@ class Container_Struct(object):
         self.__node_List = list()
         self.__search_History = Search_History_List_Struct()
         self.__search_Data = None
+        self.do_not_check_again = do_not_check_again
         self.__found_Node_List = list()
         self.__waiting_Node_Cache = list()
         self.__max_Workers = max_workers
@@ -167,7 +168,13 @@ class Container_Struct(object):
             raise Exception("Node number must be greater than 2")
             return 0
 
+    def clean_Checked_Status(self):
+        for node in self.__node_List:
+            node.set_Data_Checked(False)
+
     def __search_Task(self, waiting_node_cache):
+        self.__debug_Total_Checked_Node = 0
+        
         while self.__search_Thread_Active:
             result_list = list()
             
@@ -185,6 +192,8 @@ class Container_Struct(object):
                         
                         if waiting_node is None:
                             continue
+                        if self.get_Do_Not_Check_Again() and waiting_node.is_Data_Checked():
+                            continue
                         
                         # node_path.append(waiting_node)
                         self.__search_History.append([caller_node, waiting_node])
@@ -196,6 +205,12 @@ class Container_Struct(object):
                                 self.__search_Data
                             )
                         )
+                        self.__debug_Total_Checked_Node += 1
+                        print(
+                            f"TOTAL CHECKED NODE: {self.__debug_Total_Checked_Node}", 
+                            end="\r"
+                        )
+                        waiting_node.set_Is_Data_Checked(True)
 
                     # Wait for all threads to finish
                     for thread in local_thread_list:
@@ -219,10 +234,17 @@ class Container_Struct(object):
                     
                     sleep(0.01)
 
-    def search_Task(self, data, wait_For_First_Output_Gate=True):
+    def set_Do_Not_Check_Again(self, bool):
+        self.do_not_check_again = bool
+        
+    def get_Do_Not_Check_Again(self):
+        return self.do_not_check_again
+
+    def search_Task(self, data, wait_For_First_Output_Gate=True, do_not_check_again=True):
         self.__search_Data = data
         self.__search_History = list()
         self.__found_Node_List = list()
+        self.set_Do_Not_Check_Again(do_not_check_again)
         # self.__search_History[self.input_Gate] = dict()
         
         # Search in connected nodes (input gate)

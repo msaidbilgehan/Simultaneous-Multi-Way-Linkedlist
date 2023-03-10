@@ -37,7 +37,7 @@ NUMBER_OF_MAX_WORKERS = 100
 
 seed(time())
 SEARCHED_DATA = -13 # randint(0, 100)
-NODE_LENGTH = 300  # randint(0, 10000) or cpu_count() * 100
+NODE_LENGTH = 400  # randint(0, 10000) or cpu_count() * 100
 SEARCHED_NODE_INDEX = NODE_LENGTH - randint(1, NODE_LENGTH-1)
 
 # Create a container
@@ -117,7 +117,7 @@ print("Path Length:", len(result_queue))
 print("===== Multi-Threaded Search =====")
 
 start_time = time()
-found_node_list = container.search_Task(SEARCHED_DATA)
+found_node_list = container.search_Task(SEARCHED_DATA, True, True)
 end_time = time()
 elapsed_time = end_time - start_time
 print('Execution time:', elapsed_time, 'seconds')

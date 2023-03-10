@@ -1,7 +1,35 @@
+import os
 from random import randint, seed
 from time import time
 from Classes.Container import Container_Struct
 # from multiprocessing import cpu_count
+
+
+def path_control(path, is_file=True, is_directory=True):
+    bool_list = list()
+    if is_file:
+        bool_list.append(os.path.isfile(path))
+    if is_directory:
+        bool_list.append(os.path.isdir(path))
+    return bool_list
+
+def save_to_json(path, data, sort_keys=True, indent=4):
+    global json
+    import json
+
+    with open(path, "w") as outfile:
+        json.dump(data, outfile, sort_keys=sort_keys, indent=indent)
+    return 0
+
+def load_from_json(path):
+    data = None
+    if path_control(path, is_file=True)[0]:
+        global json
+        import json
+
+        with open(path, "r") as json_file:
+            data = json.load(json_file)
+    return data
 
 print("")
 print("=== Initialize ===")
@@ -9,7 +37,7 @@ number_of_max_worker = 100
 
 seed(time())
 searched_data = -13 # randint(0, 100)
-node_length = 100  # randint(0, 10000) or cpu_count() * 100
+node_length = 3  # randint(0, 10000) or cpu_count() * 100
 search_node_index = node_length - randint(1, node_length-1)
 
 # Create a container
@@ -32,6 +60,12 @@ layer_list = [
     node_layer_4, 
     node_layer_last
 ]
+# container.create_Node_ID_Map(
+#     node_layers=layer_list
+# )
+# node_ID_Map = container.get_Node_ID_Map()
+# print(node_ID_Map)
+# save_to_json("node_ID_Map.json", node_ID_Map, sort_keys=False, indent=4)
 
 counter_connections = 0
 counter_connections += container.connect_Input_Gate_to_Node_Layer(node_layer_1)

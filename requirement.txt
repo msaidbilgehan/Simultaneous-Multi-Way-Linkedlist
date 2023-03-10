@@ -1,0 +1,7 @@
+colorama==0.4.6
+future==0.18.3
+mando==0.6.4
+protobuf==4.21.12
+pywatchman==1.4.1
+radon==5.1.0
+six==1.16.0

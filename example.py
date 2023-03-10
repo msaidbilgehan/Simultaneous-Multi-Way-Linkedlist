@@ -33,16 +33,16 @@ def load_from_json(path):
 
 print("")
 print("=== Initialize ===")
-number_of_max_worker = 100
+NUMBER_OF_MAX_WORKERS = 100
 
 seed(time())
 SEARCHED_DATA = -13 # randint(0, 100)
-NODE_LENGTH = 3  # randint(0, 10000) or cpu_count() * 100
+NODE_LENGTH = 300  # randint(0, 10000) or cpu_count() * 100
 SEARCHED_NODE_INDEX = NODE_LENGTH - randint(1, NODE_LENGTH-1)
 
 # Create a container
-container = Container_Struct(number_of_max_worker)
-# container.set_Max_Workers(number_of_max_worker)
+container = Container_Struct(NUMBER_OF_MAX_WORKERS)
+# container.set_Max_Workers(NUMBER_OF_MAX_WORKERS)
 
 print("Max Workers:", container.get_Max_Workers())
 

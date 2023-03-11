@@ -37,7 +37,7 @@ NUMBER_OF_MAX_WORKERS = 1000
 
 seed(time())
 SEARCHED_DATA = -13 # randint(0, 100)
-NODE_LENGTH = 400  # randint(0, 10000) or cpu_count() * 100
+NODE_LENGTH = 6  # randint(0, 10000) or cpu_count() * 100
 SEARCHED_NODE_INDEX = NODE_LENGTH - randint(1, NODE_LENGTH-1)
 
 # Create a container
@@ -48,16 +48,18 @@ print("Max Workers:", container.get_Max_Workers())
 
 # Create NODE_LENGTH node layers
 node_layer_1 = container.create_Node(int(NODE_LENGTH/2))
-node_layer_2 = container.create_Node(NODE_LENGTH)
 node_layer_3 = container.create_Node(NODE_LENGTH*2)
 node_layer_4 = container.create_Node(NODE_LENGTH)
+node_layer_2 = container.create_Node(NODE_LENGTH)
+node_layer_5 = container.create_Node(40)
 node_layer_last = container.create_Node(NODE_LENGTH)
 
 layer_list = [
     node_layer_1, 
-    node_layer_2,
     node_layer_3, 
     node_layer_4, 
+    node_layer_2,
+    node_layer_5,
     node_layer_last
 ]
 # container.create_Node_ID_Map(
@@ -69,11 +71,12 @@ layer_list = [
 
 counter_connections = 0
 counter_connections += container.connect_Input_Gate_to_Node_Layer(node_layer_1)
-counter_connections += container.connect_Node_Layers(node_layer_1, node_layer_2)
+counter_connections += container.connect_Node_Layers(node_layer_1, node_layer_4)
+counter_connections += container.connect_Node_Layers(node_layer_4, node_layer_2)
 counter_connections += container.connect_Node_Layers(node_layer_2, node_layer_3)
-counter_connections += container.connect_Node_Layers(node_layer_3, node_layer_4)
-counter_connections += container.connect_Node_Layers(node_layer_4, node_layer_last)
-counter_connections += container.connect_Node_Layer_To_Output_Gate(node_layer_3)
+counter_connections += container.connect_Node_Layers(node_layer_3, node_layer_5)
+counter_connections += container.connect_Node_Layers(node_layer_5, node_layer_last)
+counter_connections += container.connect_Node_Layer_To_Output_Gate(node_layer_last)
 
 # Connect the first node to the input gate
 # counter_connections_ordered = container.connect_Node_As_Ordered()
@@ -94,19 +97,19 @@ print(
 )
 print(f"Looking for data: {SEARCHED_DATA}")
 
-print("===== Sequential Search =====")
-# get the start time
-start_time = time()
-result_queue = container.search(SEARCHED_DATA)
-end_time = time()
+# print("===== Sequential Search =====")
+# # get the start time
+# start_time = time()
+# result_queue = container.search(SEARCHED_DATA)
+# end_time = time()
 
-elapsed_time = end_time - start_time
-print('Execution time:', elapsed_time, 'seconds')
+# elapsed_time = end_time - start_time
+# print('Execution time:', elapsed_time, 'seconds')
 
-# print("Result Queue:", result_queue)
-print()
+# # print("Result Queue:", result_queue)
+# print()
 
-print("Path Length:", len(result_queue))
+# print("Path Length:", len(result_queue))
 # for node in result_queue:
 #     if node is not None:
 #         print(">{}".format(node.id), end="-")
@@ -126,5 +129,28 @@ print(f"Found {len(found_node_list)} different Node Path")
 
 # if len(found_node_list) > 0:
 #     print("found_node_list:", found_node_list[-1].id, found_node_list)
-    
+
+search_history = container.get_Search_History()
+
+print("search_history length:", len(search_history))
+
+for index, history in enumerate(search_history):
+    # Pass input gate
+    if index == 0: 
+        continue
+    print(
+        index,
+        "|",
+        history["parent_node"].id,
+        history["child_node"].id,
+        "\t|",
+        history["parent_node_index"],
+        "  \t|",
+        history["result"],
+    )
+
+# connected_node = search_history[search_history[-1][-2]][1].get_Connected_Node_List()
+
+print("")
+
 print("")

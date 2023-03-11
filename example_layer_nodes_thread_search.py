@@ -102,22 +102,7 @@ print("search_history length:", len(search_history))
 #         history["result"],
 #     )
 
-def cleanup_Path(search_history, start_index=-1):
-    path = list()
-    if search_history[start_index]["parent_node_index"] != 0:
-        path += cleanup_Path(
-                search_history, 
-                search_history[start_index]["parent_node_index"]
-            )
-        path.append(
-            search_history[start_index]
-        )
-    else:
-        return [search_history[0]]
-    return path
-
-
-path = cleanup_Path(search_history)
+path = container.cleanup_Path(search_history)
 
 print(search_history[-1]["child_node"]._data)
 
@@ -126,20 +111,4 @@ for step in path:
     print(parent_node.id, ">", child_node.id, end=" > ")
 
 print("Data")
-
-# for index, history in enumerate(search_history):
-#     # Pass input gate
-#     if index == 0:
-#         continue
-#     print(
-#         index,
-#         "|",
-#         history["parent_node"].id,
-#         history["child_node"].id,
-#         "\t|",
-#         history["parent_node_index"],
-#         "  \t|",
-#         history["result"],
-#     )
-
 print("")

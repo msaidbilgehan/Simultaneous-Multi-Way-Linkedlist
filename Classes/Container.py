@@ -316,3 +316,18 @@ class Container_Struct(object):
 
     def get_Search_History(self):
         return self.__search_History
+
+    @staticmethod
+    def cleanup_Path(search_history, start_index=-1):
+        path = list()
+        if search_history[start_index]["parent_node_index"] != 0:
+            path += Container_Struct.cleanup_Path(
+                search_history,
+                search_history[start_index]["parent_node_index"]
+            )
+            path.append(
+                search_history[start_index]
+            )
+        else:
+            return [search_history[0]]
+        return path

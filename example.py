@@ -1,17 +1,8 @@
-import os
 from random import randint, seed
 from time import time
 from Classes.Container import Container_Struct
 # from multiprocessing import cpu_count
 
-
-def path_control(path, is_file=True, is_directory=True):
-    bool_list = list()
-    if is_file:
-        bool_list.append(os.path.isfile(path))
-    if is_directory:
-        bool_list.append(os.path.isdir(path))
-    return bool_list
 
 def save_to_json(path, data, sort_keys=True, indent=4):
     global json
@@ -21,23 +12,14 @@ def save_to_json(path, data, sort_keys=True, indent=4):
         json.dump(data, outfile, sort_keys=sort_keys, indent=indent)
     return 0
 
-def load_from_json(path):
-    data = None
-    if path_control(path, is_file=True)[0]:
-        global json
-        import json
-
-        with open(path, "r") as json_file:
-            data = json.load(json_file)
-    return data
 
 print("")
 print("=== Initialize ===")
-NUMBER_OF_MAX_WORKERS = 1000
+NUMBER_OF_MAX_WORKERS = 10000
 
 seed(time())
-SEARCHED_DATA = -13 # randint(0, 100)
-NODE_LENGTH = 6  # randint(0, 10000) or cpu_count() * 100
+SEARCHED_DATA = -13  # randint(0, 100)
+NODE_LENGTH = 1000  # randint(0, 10000) or cpu_count() * 100
 SEARCHED_NODE_INDEX = NODE_LENGTH - randint(1, NODE_LENGTH-1)
 
 # Create a container
@@ -55,9 +37,9 @@ node_layer_5 = container.create_Node(40)
 node_layer_last = container.create_Node(NODE_LENGTH)
 
 layer_list = [
-    node_layer_1, 
-    node_layer_3, 
-    node_layer_4, 
+    node_layer_1,
+    node_layer_3,
+    node_layer_4,
     node_layer_2,
     node_layer_5,
     node_layer_last
@@ -71,12 +53,18 @@ layer_list = [
 
 counter_connections = 0
 counter_connections += container.connect_Input_Gate_to_Node_Layer(node_layer_1)
-counter_connections += container.connect_Node_Layers(node_layer_1, node_layer_4)
-counter_connections += container.connect_Node_Layers(node_layer_4, node_layer_2)
-counter_connections += container.connect_Node_Layers(node_layer_2, node_layer_3)
-counter_connections += container.connect_Node_Layers(node_layer_3, node_layer_5)
-counter_connections += container.connect_Node_Layers(node_layer_5, node_layer_last)
-counter_connections += container.connect_Node_Layer_To_Output_Gate(node_layer_last)
+counter_connections += container.connect_Node_Layers(
+    node_layer_1, node_layer_4)
+counter_connections += container.connect_Node_Layers(
+    node_layer_4, node_layer_2)
+counter_connections += container.connect_Node_Layers(
+    node_layer_2, node_layer_3)
+counter_connections += container.connect_Node_Layers(
+    node_layer_3, node_layer_5)
+counter_connections += container.connect_Node_Layers(
+    node_layer_5, node_layer_last)
+counter_connections += container.connect_Node_Layer_To_Output_Gate(
+    node_layer_last)
 
 # Connect the first node to the input gate
 # counter_connections_ordered = container.connect_Node_As_Ordered()
@@ -97,6 +85,7 @@ print(
 )
 print(f"Looking for data: {SEARCHED_DATA}")
 
+# print("")
 # print("===== Sequential Search =====")
 # # get the start time
 # start_time = time()
@@ -112,11 +101,13 @@ print(f"Looking for data: {SEARCHED_DATA}")
 # print("Path Length:", len(result_queue))
 # for node in result_queue:
 #     if node is not None:
-#         print(">{}".format(node.id), end="-")
+#         print(node.id, end=" > ")
 #     else:
 #         print("None", end="-")
+# print("")
 
 
+print("")
 print("===== Multi-Threaded Search =====")
 
 start_time = time()
@@ -127,30 +118,44 @@ print('Execution time:', elapsed_time, 'seconds')
 
 print(f"Found {len(found_node_list)} different Node Path")
 
-# if len(found_node_list) > 0:
-#     print("found_node_list:", found_node_list[-1].id, found_node_list)
-
 search_history = container.get_Search_History()
+_, input_gate, _ = container.get_Struct()
 
-print("search_history length:", len(search_history))
+path_checker_result = container.find_Path_By_Checker_Node(
+    search_history[-1]["child_node"], 
+    input_gate
+)
+print("\n")
+print("Find Path by Checker Result:")
+for step in path_checker_result:
+    print(step.id, end=" > ")
 
-for index, history in enumerate(search_history):
-    # Pass input gate
-    if index == 0: 
-        continue
-    print(
-        index,
-        "|",
-        history["parent_node"].id,
-        history["child_node"].id,
-        "\t|",
-        history["parent_node_index"],
-        "  \t|",
-        history["result"],
-    )
 
-# connected_node = search_history[search_history[-1][-2]][1].get_Connected_Node_List()
+# print(search_history[-1]["child_node"]._data)
+print("\n")
+print("Cleanup Path Result:")
+path = container.cleanup_Path(search_history)
+for step in path:
+    parent_node, child_node, parent_index, result = step.values()
+    print(child_node.id, end=" > ")
 
-print("")
+print("Data")
+
+print("path length:", len(path))
+
+# for index, history in enumerate(search_history):
+#     # Pass input gate
+#     if index == 0:
+#         continue
+#     print(
+#         index,
+#         "|",
+#         history["parent_node"].id,
+#         history["child_node"].id,
+#         "\t|",
+#         history["parent_node_index"],
+#         "  \t|",
+#         history["result"],
+#     )
 
 print("")

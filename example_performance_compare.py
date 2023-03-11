@@ -1,7 +1,7 @@
 from random import randint, seed
 from time import time
 from Classes.Container import Container_Struct
-
+# from multiprocessing import cpu_count
 
 
 def save_to_json(path, data, sort_keys=True, indent=4):
@@ -18,7 +18,7 @@ NUMBER_OF_MAX_WORKERS = 1000
 
 seed(time())
 SEARCHED_DATA = -13 # randint(0, 100)
-NODE_LENGTH = 6  # randint(0, 10000) or cpu_count() * 100
+NODE_LENGTH = 250  # randint(0, 10000) or cpu_count() * 100
 SEARCHED_NODE_INDEX = NODE_LENGTH - randint(1, NODE_LENGTH-1)
 
 # Create a container
@@ -43,6 +43,12 @@ layer_list = [
     node_layer_5,
     node_layer_last
 ]
+# container.create_Node_ID_Map(
+#     node_layers=layer_list
+# )
+# node_ID_Map = container.get_Node_ID_Map()
+# print(node_ID_Map)
+# save_to_json("node_ID_Map.json", node_ID_Map, sort_keys=False, indent=4)
 
 counter_connections = 0
 counter_connections += container.connect_Input_Gate_to_Node_Layer(node_layer_1)
@@ -53,6 +59,8 @@ counter_connections += container.connect_Node_Layers(node_layer_3, node_layer_5)
 counter_connections += container.connect_Node_Layers(node_layer_5, node_layer_last)
 counter_connections += container.connect_Node_Layer_To_Output_Gate(node_layer_last)
 
+# Connect the first node to the input gate
+# counter_connections_ordered = container.connect_Node_As_Ordered()
 
 print()
 print("=== Node Layers ===")
@@ -70,6 +78,29 @@ print(
 )
 print(f"Looking for data: {SEARCHED_DATA}")
 
+print("")
+print("===== Sequential Search =====")
+# get the start time
+start_time = time()
+result_queue = container.search(SEARCHED_DATA)
+end_time = time()
+
+elapsed_time = end_time - start_time
+print('Execution time:', elapsed_time, 'seconds')
+
+# print("Result Queue:", result_queue)
+print()
+
+print("Path Length:", len(result_queue))
+for node in result_queue:
+    if node is not None:
+        print(node.id, end=" > ")
+    else:
+        print("None", end="-")
+print("")
+
+
+print("")
 print("===== Multi-Threaded Search =====")
 
 start_time = time()
@@ -80,12 +111,19 @@ print('Execution time:', elapsed_time, 'seconds')
 
 print(f"Found {len(found_node_list)} different Node Path")
 
-# if len(found_node_list) > 0:
-#     print("found_node_list:", found_node_list[-1].id, found_node_list)
-
 search_history = container.get_Search_History()
 
-print("search_history length:", len(search_history))
+path = container.cleanup_Path(search_history)
+
+# print(search_history[-1]["child_node"]._data)
+
+for step in path:
+    parent_node, child_node, parent_index, result = step.values()
+    print(child_node.id, end=" > ")
+
+print("Data")
+
+print("path length:", len(path))
 
 # for index, history in enumerate(search_history):
 #     # Pass input gate
@@ -102,39 +140,4 @@ print("search_history length:", len(search_history))
 #         history["result"],
 #     )
 
-# print()
-# container.set_Recursion_Limit(value=1000)
-# print("Recursion Limit:", container.get_Recursion_Limit())
-# print()
-
-print()
-print("Find Path By Checker Node Recursive Path Result:")
-path_recursive = container.find_Path_By_Checker_Node_Recursive(
-    [search_history[-1]["child_node"]],
-    search_history[0]["child_node"]
-)
-for step in path_recursive:
-    print(step.id, end=" > ")
-
-path = container.cleanup_Path(search_history)
-path_checker_result = container.find_Path_By_Checker_Node(
-    search_history[-1]["child_node"], 
-    search_history[0]["child_node"]
-)
-
-# print()
-# print(search_history[-1]["child_node"]._data)
-print("\n")
-
-print("Cleanup Path Result:")
-for step in path:
-    parent_node, child_node, parent_index, result = step.values()
-    print(child_node.id, end=" > ")
-
-print("\n")
-print("Find Path by Checker Result:")
-for step in path_checker_result:
-    print(step.id, end=" > ")
-
-print("Data")
 print("")

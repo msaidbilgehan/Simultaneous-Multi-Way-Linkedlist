@@ -1,6 +1,7 @@
 
 from concurrent.futures import ThreadPoolExecutor
 from threading import Thread
+import sys
 from time import sleep
 from Classes.Gate import Gate_Struct
 from Classes.Node import Node_Struct
@@ -217,7 +218,7 @@ class Container_Struct(object):
                             f"TOTAL CHECKED NODE: {__debug_Total_Checked_Node}", 
                             end="\r"
                         )
-                        child_node.set_Is_Data_Checked(True)
+                        child_node.set_Is_Data_Checked(True, parent_node)
                     parent_node_index = cache
 
                     # Wait for all threads to finish
@@ -330,4 +331,40 @@ class Container_Struct(object):
             )
         else:
             return [search_history[0]]
+        return path
+    
+    @staticmethod
+    def set_Recursion_Limit(value=10000):
+        sys.setrecursionlimit(value)
+
+    @staticmethod
+    def get_Recursion_Limit():
+        return sys.getrecursionlimit()
+
+    @staticmethod
+    def find_Path_By_Checker_Node_Recursive(node, input_Gate) -> list:
+        path = list()
+        if node[0] is not input_Gate:
+            path += Container_Struct.find_Path_By_Checker_Node_Recursive(
+                [node[0].checked_by], 
+                input_Gate
+            )
+            path.append(node[0])
+            return path
+        else:
+            return [input_Gate]
+
+    @staticmethod
+    def find_Path_By_Checker_Node(node, input_Gate) -> list:
+        path = list()
+        current_Node = node
+        
+        while True:
+            path.append(current_Node)
+            # print(current_Node.id, end="\r")
+            if current_Node is not input_Gate:
+                current_Node = current_Node.checked_by
+            else:
+                path.append(current_Node)
+                break
         return path

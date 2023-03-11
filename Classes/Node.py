@@ -25,6 +25,7 @@ class Node_Struct(object):
         
         self._data = data
         self._is_Data_Checked = False
+        self.checked_by = None
         
         self.id = self.id_Counter
         
@@ -83,8 +84,9 @@ class Node_Struct(object):
     def compare_Data_Aware(self, data) -> list:
         return [self._data == data, self]
     
-    def set_Is_Data_Checked(self, bool):
+    def set_Is_Data_Checked(self, bool, checker_node):
         self._is_Data_Checked = bool
+        self.checked_by = checker_node
     
     def is_Data_Checked(self):
         return self._is_Data_Checked

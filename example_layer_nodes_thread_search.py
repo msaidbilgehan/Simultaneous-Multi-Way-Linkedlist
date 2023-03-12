@@ -18,7 +18,7 @@ NUMBER_OF_MAX_WORKERS = 1000
 
 seed(time())
 SEARCHED_DATA = -13 # randint(0, 100)
-NODE_LENGTH = 6  # randint(0, 10000) or cpu_count() * 100
+NODE_LENGTH = 1000  # randint(0, 10000) or cpu_count() * 100
 SEARCHED_NODE_INDEX = NODE_LENGTH - randint(1, NODE_LENGTH-1)
 
 # Create a container
@@ -59,6 +59,7 @@ print("=== Node Layers ===")
 print("Node Number:", container.get_Node_Number())
 print("Blocked Node Number:", container.get_Blocked_Node_Number())
 print("Connections:", counter_connections)
+print()
 
 for layer in layer_list:
     print("Layer Length:", len(layer))

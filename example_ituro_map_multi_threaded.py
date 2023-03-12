@@ -82,6 +82,13 @@ print(
 print(
     f"Looking for data: {SEARCHED_DATA}"
 )
+# nodes_x[0].set_Data(SEARCHED_DATA)
+# print(
+#     f"nodes_x[0] (id is {nodes_x[0].id}) contains {nodes_x[0].get_Data()}"
+# )
+# print(
+#     f"Looking for data: {SEARCHED_DATA}"
+# )
 
 print("")
 print("===== Sequential Search =====")

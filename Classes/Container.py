@@ -71,7 +71,6 @@ class Container_Struct(object):
 
         self.__search_Producer_Thread.start()
         
-        
     def get_Max_Workers(self):
         return self.__max_Workers
     
@@ -150,7 +149,63 @@ class Container_Struct(object):
             if node.get_Blocked_Status():
                 blocked_Node_Number += 1
         return blocked_Node_Number
-    
+
+    @staticmethod
+    def connect_Nodes_As_Sequential(nodes, bi_direction=True) -> int:
+        connections = 0
+        for i in range(len(nodes) - 1):
+            nodes[i].connect_To_Node(nodes[i+1])
+            connections += 1
+            if bi_direction:
+                nodes[i+1].connect_To_Node(nodes[i])
+                connections += 1
+        return connections
+
+    @staticmethod
+    def connect_Nodes_One_O_One(layer_1, layer_2, bi_direction=True) -> int:
+        connections = 0
+        for i in range(len(layer_1)):
+            connections += 1
+            layer_1[i].connect_To_Node(
+                layer_2[i]
+            )
+            if bi_direction:
+                layer_2[i].connect_To_Node(
+                    layer_1[i]
+                )
+                connections += 1
+        return connections
+
+    @staticmethod
+    def connect_Nodes_To_Node(from_nodes, to_node, bi_direction=True) -> int:
+        connections = 0
+        for node in from_nodes:
+            node.connect_To_Node(
+                to_node
+            )
+            connections += 1
+            if bi_direction:
+                to_node.connect_To_Node(
+                    node
+                )
+                connections += 1
+        return connections
+
+    @staticmethod
+    def connect_Node_To_Nodes(from_node, to_nodes, bi_direction=True) -> int:
+        connections = 0
+        for node in to_nodes:
+            node.connect_To_Node(
+                from_node
+            )
+            connections += 1
+            if bi_direction:
+                from_node.connect_To_Node(
+                    node
+                )
+                connections += 1
+        return connections
+
     def connect_Node_As_Ordered(self) -> int:
         counter_connections = 0
         if len(self.__node_List) > 2:

@@ -110,19 +110,28 @@ elapsed_time = end_time - start_time
 print('Execution time:', elapsed_time, 'seconds')
 
 print(f"Found {len(found_node_list)} different Node Path")
+for node in found_node_list:
+    print("ID:", node.id, "| Data:", node.get_Data())
 
-search_history = container.get_Search_History()
+# search_history = container.get_Search_History()
 
-path = container.cleanup_Path(search_history)
+# path = container.cleanup_Path(search_history)
+# for step in path:
+#     parent_node, child_node, parent_index, result = step.values()
+#     print(child_node.id, end=" > ")
 
-# print(search_history[-1]["child_node"]._data)
+_, input_gate, _ = container.get_Struct()
 
-for step in path:
-    parent_node, child_node, parent_index, result = step.values()
-    print(child_node.id, end=" > ")
+path = container.find_Path_By_Checker_Node(
+    found_node_list[0],
+    input_gate
+)
+path = path[:-1]
+path = path[::-1]
 
-print("Data")
-
+for node in path:
+    print(node.id, end=" > ")
+print()
 print("path length:", len(path))
 
 # for index, history in enumerate(search_history):

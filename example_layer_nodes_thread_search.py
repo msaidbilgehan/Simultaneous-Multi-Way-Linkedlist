@@ -80,61 +80,20 @@ print('Execution time:', elapsed_time, 'seconds')
 
 print(f"Found {len(found_node_list)} different Node Path")
 
-# if len(found_node_list) > 0:
-#     print("found_node_list:", found_node_list[-1].id, found_node_list)
-
-search_history = container.get_Search_History()
-
-print("search_history length:", len(search_history))
-
-# for index, history in enumerate(search_history):
-#     # Pass input gate
-#     if index == 0: 
-#         continue
-#     print(
-#         index,
-#         "|",
-#         history["parent_node"].id,
-#         history["child_node"].id,
-#         "\t|",
-#         history["parent_node_index"],
-#         "  \t|",
-#         history["result"],
-#     )
-
-# print()
-# container.set_Recursion_Limit(value=1000)
-# print("Recursion Limit:", container.get_Recursion_Limit())
-# print()
-
 print()
-print("Find Path By Checker Node Recursive Path Result:")
-path_recursive = container.find_Path_By_Checker_Node_Recursive(
-    [search_history[-1]["child_node"]],
-    search_history[0]["child_node"]
+
+_, input_gate, _ = container.get_Struct()
+
+path = container.find_Path_By_Checker_Node(
+    found_node_list[0],
+    input_gate
 )
-for step in path_recursive:
-    print(step.id, end=" > ")
+path = path[:-1]
+path = path[::-1]
 
-path = container.cleanup_Path(search_history)
-path_checker_result = container.find_Path_By_Checker_Node(
-    search_history[-1]["child_node"], 
-    search_history[0]["child_node"]
-)
-
-# print()
-# print(search_history[-1]["child_node"]._data)
-print("\n")
-
-print("Cleanup Path Result:")
-for step in path:
-    parent_node, child_node, parent_index, result = step.values()
-    print(child_node.id, end=" > ")
-
-print("\n")
 print("Find Path by Checker Result:")
-for step in path_checker_result:
-    print(step.id, end=" > ")
+for node in path:
+    print(node.id, end=" > ")
+print("\n")
+print("path length:", len(path))
 
-print("Data")
-print("")

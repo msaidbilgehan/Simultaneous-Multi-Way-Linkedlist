@@ -19,7 +19,7 @@ NUMBER_OF_MAX_WORKERS = 10000
 
 seed(time())
 SEARCHED_DATA = -13  # randint(0, 100)
-NODE_LENGTH = 1000  # randint(0, 10000) or cpu_count() * 100
+NODE_LENGTH = 100  # randint(0, 10000) or cpu_count() * 100
 SEARCHED_NODE_INDEX = NODE_LENGTH - randint(1, NODE_LENGTH-1)
 
 # Create a container
@@ -117,14 +117,16 @@ elapsed_time = end_time - start_time
 print('Execution time:', elapsed_time, 'seconds')
 
 print(f"Found {len(found_node_list)} different Node Path")
+for node in found_node_list:
+    print("ID:", node.id)
 
-search_history = container.get_Search_History()
 _, input_gate, _ = container.get_Struct()
-
 path_checker_result = container.find_Path_By_Checker_Node(
-    search_history[-1]["child_node"], 
+    found_node_list[0],
     input_gate
 )
+path_checker_result = path_checker_result[:-1]
+path_checker_result = path_checker_result[::-1]
 print("\n")
 print("Find Path by Checker Result:")
 for step in path_checker_result:
@@ -134,6 +136,7 @@ for step in path_checker_result:
 # print(search_history[-1]["child_node"]._data)
 print("\n")
 print("Cleanup Path Result:")
+search_history = container.get_Search_History()
 path = container.cleanup_Path(search_history)
 for step in path:
     parent_node, child_node, parent_index, result = step.values()

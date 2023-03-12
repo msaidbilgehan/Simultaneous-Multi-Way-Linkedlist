@@ -45,16 +45,19 @@ class Node_Struct(object):
         Node_Struct.id_Counter += 1
         return super(Node_Struct, cls).__new__(cls, *args, **kwargs)
     
-    def connect_Two_Way_Node(self, node):
+    def connect_Two_Way_Node(self, node) -> int:
         self.connected_Node_List.append(node)
-        node.connected_Node_List.append(node)
+        node.connected_Node_List.append(self)
+        return 2
 
-    def disconnect_Two_Way_Node(self, node):
+    def disconnect_Two_Way_Node(self, node) -> int:
         self.connected_Node_List.remove(node)
         node.connected_Node_List.remove(self)
-        
-    def connect_To_Node(self, node):
+        return 2
+
+    def connect_To_Node(self, node) -> int:
         self.connected_Node_List.append(node)
+        return 1
         
     def disconnect_From_Node(self, node):
         self.connected_Node_List.remove(node)

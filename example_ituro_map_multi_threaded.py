@@ -113,7 +113,7 @@ print("\n")
 print("===== Multi-Threaded Search =====")
 
 start_time = time()
-found_node_list = container.search_Task(SEARCHED_DATA, True, True)
+found_node_list = container.search_Task([SEARCHED_DATA], True, True)
 end_time = time()
 elapsed_time = end_time - start_time
 print('Execution time:', elapsed_time, 'seconds')

@@ -11,9 +11,10 @@ from Classes.Search_History import Search_History_List_Struct
 class Container_Struct(object):
     id_counter = 0
 
-    def __init__(self, max_workers=None, do_not_check_again=True):
+    def __init__(self, max_workers:int|None=None, do_not_check_again:bool=True, verbose:bool=False):
 
         self.id = self.id_counter
+        self.is_verbose = verbose
         
         self.input_Gate = Gate_Struct()
         self.output_Gate = Gate_Struct()
@@ -56,7 +57,7 @@ class Container_Struct(object):
         self.__search_Task_Consumer_Thread.start()
 
     # https://stackoverflow.com/questions/674304/why-is-init-always-called-after-new
-    def __new__(cls, max_workers=None, *args, **kwargs):
+    def __new__(cls, max_workers: int | None = None, do_not_check_again: bool = True, verbose: bool = False, *args, **kwargs):
         # Node ID
         # cls.id_counter += 1
         Container_Struct.id_counter += 1
@@ -258,14 +259,6 @@ class Container_Struct(object):
                     if self.get_Do_Not_Check_Again() and child_node.is_Data_Checked():
                         continue
 
-                    self.__search_History.append(
-                        {
-                            "parent_node": parent_node,
-                            "child_node": child_node,
-                            "result": False
-                        }
-                    )
-
                     # Start a thread for each node
                     self.__result_thread_list.append(
                         executor.submit(
@@ -273,11 +266,17 @@ class Container_Struct(object):
                             self.__search_Data_List
                         )
                     )
+
+                    self.__search_History.append(
+                        child_node
+                    )
+                    
                     __total_Checked_Node += 1
-                    # print(
-                    #     f"TOTAL CHECKED NODE: {__total_Checked_Node}",
-                    #     end="\r"
-                    # )
+                    # if self.is_verbose:
+                    #     print(
+                    #         f"TOTAL CHECKED NODE: {__total_Checked_Node}",
+                    #         end="\r"
+                    #     )
                     child_node.set_Is_Data_Checked(True, parent_node)
                     
                     for neighbor in child_node.get_Connected_Node_List():
@@ -289,9 +288,14 @@ class Container_Struct(object):
                         )
 
                     sleep(0.01)
-                    if __total_Checked_Node == len(self.__node_List):
-                        self.set_Is_Searched_All_Nodes(True)
-                        break
+                    if self.get_Do_Not_Check_Again():
+                        if __total_Checked_Node == len(self.__node_List):
+                            self.set_Is_Searched_All_Nodes(True)
+                            break
+                    else:
+                        # TODO: If every thread can check the node already checked
+                        # How do we know the search run is finished?
+                        pass
 
     def __search_Task_Consumer(self):
         result_list = list()
@@ -306,15 +310,18 @@ class Container_Struct(object):
                 # Check if there is a result
                 result, node = result_list[-1]
                 __total_Checked_Node += 1
-                # print(
-                #     f"Getting Result From Nodes: {__total_Checked_Node}",
-                #     end="\r"
-                # )
+                if self.is_verbose:
+                    print(
+                        f"Getting Result From Nodes: {__total_Checked_Node}",
+                        end="\r"
+                    )
                 if result:
                     found_results.append(node)
                     self.__found_Node_List.append(node)
 
                 if __total_Checked_Node == len(self.__node_List):
+                    if self.is_verbose:
+                        print()
                     self.set_Is_Received_All_Results(True)
                     break
 
@@ -338,7 +345,6 @@ class Container_Struct(object):
 
     def search_Task(self, data:list, wait_until_k_number_found:int=-1, do_not_check_again:bool=True):
         self.__search_Data_List = data
-        self.__search_History = list()
         self.__found_Node_List = list()
         self.set_Do_Not_Check_Again(do_not_check_again)
         
@@ -355,10 +361,12 @@ class Container_Struct(object):
             if len(self.__found_Node_List) >= wait_until_k_number_found and wait_until_k_number_found > 0:
                 break
             if self.get_Is_Searched_All_Nodes():
-                print("Searched all nodes!")
+                if self.is_verbose:
+                    print("Searched all nodes!")
                 self.set_Is_Searched_All_Nodes(False)
             elif self.get_Is_Received_All_Results():
-                print("Received all nodes!")
+                if self.is_verbose:
+                    print("Received all nodes!")
                 self.set_Is_Received_All_Results(False)
                 break
             

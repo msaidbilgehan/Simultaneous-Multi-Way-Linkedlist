@@ -319,11 +319,16 @@ class Container_Struct(object):
                     found_results.append(node)
                     self.__found_Node_List.append(node)
 
-                if __total_Checked_Node == len(self.__node_List):
-                    if self.is_verbose:
-                        print()
-                    self.set_Is_Received_All_Results(True)
-                    break
+                if self.get_Do_Not_Check_Again():
+                    if __total_Checked_Node == len(self.__node_List):
+                        if self.is_verbose:
+                            print()
+                        self.set_Is_Received_All_Results(True)
+                        break
+                    else:
+                        # TODO: If every thread can check the node already checked
+                        # How do we know the search run is finished?
+                        pass
 
     def set_Do_Not_Check_Again(self, bool):
         self.do_not_check_again = bool

@@ -365,15 +365,21 @@ class Container_Struct(object):
         while not self.is_Received_All_Results:
             if len(self.__found_Node_List) >= wait_until_k_number_found and wait_until_k_number_found > 0:
                 break
-            if self.get_Is_Searched_All_Nodes():
-                if self.is_verbose:
-                    print("Searched all nodes!")
-                self.set_Is_Searched_All_Nodes(False)
-            elif self.get_Is_Received_All_Results():
-                if self.is_verbose:
-                    print("Received all nodes!")
-                self.set_Is_Received_All_Results(False)
-                break
+            
+            if self.get_Do_Not_Check_Again():
+                if self.get_Is_Searched_All_Nodes():
+                    if self.is_verbose:
+                        print("Searched all nodes!")
+                    self.set_Is_Searched_All_Nodes(False)
+                elif self.get_Is_Received_All_Results():
+                    if self.is_verbose:
+                        print("Received all nodes!")
+                    self.set_Is_Received_All_Results(False)
+                    break
+            else:
+                # TODO: If every thread can check the node already checked
+                # How do we know the search run is finished?
+                pass
             
         return self.__found_Node_List
 

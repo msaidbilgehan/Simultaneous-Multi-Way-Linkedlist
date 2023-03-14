@@ -20,44 +20,40 @@ class Container_Struct(object):
         
         self.__node_array_map = list()
         self.__node_id_array_map = list()
+        
         self.__node_List = list()
         self.__search_History = Search_History_List_Struct()
-        self.__search_Data = None
-        self.do_not_check_again = do_not_check_again
+        self.__search_Data_List = list()
         self.__found_Node_List = list()
         self.__result_thread_list = list()
         self.__waiting_Node_Cache = list()
+        
         self.__max_Workers = max_workers
         self.__search_Thread_Active = True
-        # self.__active_Thread_Cache = list()
+        self.do_not_check_again = do_not_check_again
+
+        self.is_Searched_All_Nodes = False
+        self.is_Received_All_Results = False
         
         self.__search_Producer_Thread = Thread(
-            target=self.__search_Task,
+            target=self.__search_Task_Producer,
             args=[
                 self.__waiting_Node_Cache
             ]
         )
-        self.__search_Task_Result_Thread = Thread(
-            target=self.__search_Task_Result,
-            args=[]
-        )
-        
-        self.is_Searched_All_Nodes = False
-        self.is_Received_All_Results = False
-        
-        self.__search_Producer_Thread.setDaemon(True)  # don't hang on exit
+
+        # don't hang on exit
+        self.__search_Producer_Thread.setDaemon(True)
         self.__search_Producer_Thread.start()
         
-        self.__search_Task_Result_Thread.setDaemon(True)  # don't hang on exit
-        self.__search_Task_Result_Thread.start()
-        
-        # self.__search_Consumer_Thread = Thread(
-        #     target=self.__search_Consumer_Task,
-        #     args=[
-        #         self.__active_Thread_Cache
-        #     ]
-        # )
-        # self.__search_Consumer_Thread.start()
+        self.__search_Task_Consumer_Thread = Thread(
+            target=self.__search_Task_Consumer,
+            args=[]
+        )
+
+        # don't hang on exit
+        self.__search_Task_Consumer_Thread.setDaemon(True)
+        self.__search_Task_Consumer_Thread.start()
 
     # https://stackoverflow.com/questions/674304/why-is-init-always-called-after-new
     def __new__(cls, max_workers=None, *args, **kwargs):
@@ -75,7 +71,7 @@ class Container_Struct(object):
         self.__search_Task_Thread.join()
 
         self.__search_Task_Thread = Thread(
-            target=self.__search_Task,
+            target=self.__search_Task_Producer,
             args=[
                 self.__waiting_Node_Cache
             ]
@@ -242,15 +238,12 @@ class Container_Struct(object):
         for node in self.__node_List:
             node.set_Is_Data_Checked(False)
 
-    def __search_Task(self, waiting_node_cache):
+    def __search_Task_Producer(self, waiting_node_cache):
         __total_Checked_Node = 0
 
         while self.__search_Thread_Active:
             # Check if there is a new thread in waiting thread cache
             with ThreadPoolExecutor(max_workers=self.get_Max_Workers()) as executor:
-                parent_node_index = 0
-                cache = 0
-
                 # Search in connected nodes
                 while self.__search_Thread_Active:
                     if len(waiting_node_cache) > 0:
@@ -269,7 +262,6 @@ class Container_Struct(object):
                         {
                             "parent_node": parent_node,
                             "child_node": child_node,
-                            "parent_node_index": parent_node_index,
                             "result": False
                         }
                     )
@@ -277,8 +269,8 @@ class Container_Struct(object):
                     # Start a thread for each node
                     self.__result_thread_list.append(
                         executor.submit(
-                            child_node.compare_Data_Aware,
-                            self.__search_Data
+                            child_node.compare_Multiple_Data_Aware,
+                            self.__search_Data_List
                         )
                     )
                     __total_Checked_Node += 1
@@ -295,19 +287,17 @@ class Container_Struct(object):
                                 "child_node": neighbor,
                             }
                         )
-                    parent_node_index = cache
-
-                    cache = len(self.__search_History)
 
                     sleep(0.01)
                     if __total_Checked_Node == len(self.__node_List):
                         self.set_Is_Searched_All_Nodes(True)
                         break
 
-    def __search_Task_Result(self):
+    def __search_Task_Consumer(self):
         result_list = list()
         found_results = list()
         __total_Checked_Node = 0
+        
         while self.__search_Thread_Active:
             # Wait for all threads to finish
             if len(self.__result_thread_list) > 0:                
@@ -326,7 +316,6 @@ class Container_Struct(object):
 
                 if __total_Checked_Node == len(self.__node_List):
                     self.set_Is_Received_All_Results(True)
-                    self.is_Received_All_Results = True
                     break
 
     def set_Do_Not_Check_Again(self, bool):
@@ -348,11 +337,10 @@ class Container_Struct(object):
         self.is_Received_All_Results = bool
 
     def search_Task(self, data, wait_until_k_number_found=-1, do_not_check_again=True):
-        self.__search_Data = data
+        self.__search_Data_List = data
         self.__search_History = list()
         self.__found_Node_List = list()
         self.set_Do_Not_Check_Again(do_not_check_again)
-        # self.__search_History[self.input_Gate] = dict()
         
         # Search in connected nodes (input gate)
         self.__waiting_Node_Cache.append(
@@ -361,6 +349,7 @@ class Container_Struct(object):
                 "child_node": self.input_Gate,
             }
         )
+        
         # Wait until search process to finish or k number found 
         while not self.is_Received_All_Results:
             if len(self.__found_Node_List) >= wait_until_k_number_found and wait_until_k_number_found > 0:
@@ -372,6 +361,7 @@ class Container_Struct(object):
                 print("Received all nodes!")
                 self.set_Is_Received_All_Results(False)
                 break
+            
         return self.__found_Node_List
 
     def search(self, data):
@@ -407,21 +397,6 @@ class Container_Struct(object):
 
     def get_Search_History(self):
         return self.__search_History
-
-    @staticmethod
-    def cleanup_Path(search_history, start_index=-1):
-        path = list()
-        if search_history[start_index]["parent_node_index"] != 0:
-            path += Container_Struct.cleanup_Path(
-                search_history,
-                search_history[start_index]["parent_node_index"]
-            )
-            path.append(
-                search_history[start_index]
-            )
-        else:
-            return [search_history[0]]
-        return path
     
     @staticmethod
     def set_Recursion_Limit(value=10000):

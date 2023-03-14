@@ -87,6 +87,12 @@ class Node_Struct(object):
     def compare_Data_Aware(self, data) -> list:
         return [self._data == data, self]
     
+    def compare_Multiple_Data_Aware(self, data_list) -> list:
+        for data in data_list:
+            if data == self._data:
+                return [True, self]
+        return [False, self]
+    
     def set_Is_Data_Checked(self, bool, checker_node=None):
         self._is_Data_Checked = bool
         self.checked_by = checker_node

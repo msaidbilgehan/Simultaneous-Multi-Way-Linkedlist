@@ -336,7 +336,7 @@ class Container_Struct(object):
     def set_Is_Received_All_Results(self, bool):
         self.is_Received_All_Results = bool
 
-    def search_Task(self, data, wait_until_k_number_found=-1, do_not_check_again=True):
+    def search_Task(self, data:list, wait_until_k_number_found:int=-1, do_not_check_again:bool=True):
         self.__search_Data_List = data
         self.__search_History = list()
         self.__found_Node_List = list()
@@ -399,7 +399,7 @@ class Container_Struct(object):
         return self.__search_History
     
     @staticmethod
-    def set_Recursion_Limit(value=10000):
+    def set_Recursion_Limit(value:int=10000):
         sys.setrecursionlimit(value)
 
     @staticmethod

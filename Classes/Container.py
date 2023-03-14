@@ -25,18 +25,32 @@ class Container_Struct(object):
         self.__search_Data = None
         self.do_not_check_again = do_not_check_again
         self.__found_Node_List = list()
+        self.__result_thread_list = list()
         self.__waiting_Node_Cache = list()
         self.__max_Workers = max_workers
         self.__search_Thread_Active = True
         # self.__active_Thread_Cache = list()
+        
         self.__search_Producer_Thread = Thread(
             target=self.__search_Task,
             args=[
                 self.__waiting_Node_Cache
             ]
         )
+        self.__search_Task_Result_Thread = Thread(
+            target=self.__search_Task_Result,
+            args=[]
+        )
+        
+        self.is_Searched_All_Nodes = False
+        self.is_Received_All_Results = False
+        
         self.__search_Producer_Thread.setDaemon(True)  # don't hang on exit
         self.__search_Producer_Thread.start()
+        
+        self.__search_Task_Result_Thread.setDaemon(True)  # don't hang on exit
+        self.__search_Task_Result_Thread.start()
+        
         # self.__search_Consumer_Thread = Thread(
         #     target=self.__search_Consumer_Task,
         #     args=[
@@ -58,18 +72,18 @@ class Container_Struct(object):
         
     def restart_Search_Thread(self):
         self.__search_Thread_Active = False
-        self.__search_Producer_Thread.join()
+        self.__search_Task_Thread.join()
 
-        self.__search_Producer_Thread = Thread(
+        self.__search_Task_Thread = Thread(
             target=self.__search_Task,
             args=[
                 self.__waiting_Node_Cache
             ]
         )
-        self.__search_Producer_Thread.setDaemon(True)  # don't hang on exit
+        self.__search_Task_Thread.setDaemon(True)  # don't hang on exit
         self.__search_Thread_Active = True
 
-        self.__search_Producer_Thread.start()
+        self.__search_Task_Thread.start()
         
     def get_Max_Workers(self):
         return self.__max_Workers
@@ -226,85 +240,94 @@ class Container_Struct(object):
 
     def clean_Checked_Status(self):
         for node in self.__node_List:
-            node.set_Data_Checked(False)
+            node.set_Is_Data_Checked(False)
 
     def __search_Task(self, waiting_node_cache):
-        __debug_Total_Checked_Node = 0
-        
+        __total_Checked_Node = 0
+
         while self.__search_Thread_Active:
-            result_list = list()
-            
             # Check if there is a new thread in waiting thread cache
             with ThreadPoolExecutor(max_workers=self.get_Max_Workers()) as executor:
                 parent_node_index = 0
                 cache = 0
-                
+
                 # Search in connected nodes
                 while self.__search_Thread_Active:
-                    local_waiting_node_cache = list()
-                    local_thread_list = list()
+                    if len(waiting_node_cache) > 0:
+                        node_pack = waiting_node_cache.pop()
+                    else:
+                        continue
                     
-                    for node_pack in waiting_node_cache:
-                        parent_node, child_node = node_pack.values()
-                        
-                        if child_node is None:
-                            continue
-                        if self.get_Do_Not_Check_Again() and child_node.is_Data_Checked():
-                            continue
+                    parent_node, child_node = node_pack.values()
 
-                        self.__search_History.append(
+                    if child_node is None:
+                        continue
+                    if self.get_Do_Not_Check_Again() and child_node.is_Data_Checked():
+                        continue
+
+                    self.__search_History.append(
+                        {
+                            "parent_node": parent_node,
+                            "child_node": child_node,
+                            "parent_node_index": parent_node_index,
+                            "result": False
+                        }
+                    )
+
+                    # Start a thread for each node
+                    self.__result_thread_list.append(
+                        executor.submit(
+                            child_node.compare_Data_Aware,
+                            self.__search_Data
+                        )
+                    )
+                    __total_Checked_Node += 1
+                    # print(
+                    #     f"TOTAL CHECKED NODE: {__total_Checked_Node}",
+                    #     end="\r"
+                    # )
+                    child_node.set_Is_Data_Checked(True, parent_node)
+                    
+                    for neighbor in child_node.get_Connected_Node_List():
+                        waiting_node_cache.append(
                             {
-                                "parent_node": parent_node,
-                                "child_node": child_node,
-                                "parent_node_index": parent_node_index,
-                                "result": False
+                                "parent_node": child_node,
+                                "child_node": neighbor,
                             }
                         )
-                        
-                        # Start a thread for each node
-                        local_thread_list.append(
-                            executor.submit(
-                                child_node.compare_Data_Aware,
-                                self.__search_Data
-                            )
-                        )
-                        __debug_Total_Checked_Node += 1
-                        print(
-                            f"TOTAL CHECKED NODE: {__debug_Total_Checked_Node}", 
-                            end="\r"
-                        )
-                        child_node.set_Is_Data_Checked(True, parent_node)
                     parent_node_index = cache
 
-                    # Wait for all threads to finish
-                    for thread in local_thread_list:
-                        result_list.append(thread.result())
-                        
-                        # Check if there is a result
-                        result, node = result_list[-1]
-                        if result:
-                            local_waiting_node_cache.append(
-                                {
-                                    "parent_node": node, 
-                                    "child_node": None,
-                                }
-                            )
-                            self.__search_History[-1]["result"] = True
-                            self.__found_Node_List.append(node)
-                        else:
-                            for index, neighbor in enumerate(node.get_Connected_Node_List()):
-                                local_waiting_node_cache.append(
-                                    {
-                                        "parent_node": node,
-                                        "child_node": neighbor,
-                                    }
-                                )
-                    
                     cache = len(self.__search_History)
-                    waiting_node_cache.clear()
-                    waiting_node_cache += local_waiting_node_cache
-                    
+
                     sleep(0.01)
+                    if __total_Checked_Node == len(self.__node_List):
+                        self.set_Is_Searched_All_Nodes(True)
+                        break
+
+    def __search_Task_Result(self):
+        result_list = list()
+        found_results = list()
+        __total_Checked_Node = 0
+        while self.__search_Thread_Active:
+            # Wait for all threads to finish
+            if len(self.__result_thread_list) > 0:                
+                result_thread = self.__result_thread_list.pop()
+                result_list.append(result_thread.result())
+                # Check if there is a result
+                result, node = result_list[-1]
+                __total_Checked_Node += 1
+                # print(
+                #     f"Getting Result From Nodes: {__total_Checked_Node}",
+                #     end="\r"
+                # )
+                if result:
+                    found_results.append(node)
+                    self.__found_Node_List.append(node)
+
+                if __total_Checked_Node == len(self.__node_List):
+                    self.set_Is_Received_All_Results(True)
+                    self.is_Received_All_Results = True
+                    break
 
     def set_Do_Not_Check_Again(self, bool):
         self.do_not_check_again = bool
@@ -312,7 +335,19 @@ class Container_Struct(object):
     def get_Do_Not_Check_Again(self):
         return self.do_not_check_again
 
-    def search_Task(self, data, wait_For_First_Output_Gate=True, do_not_check_again=True):
+    def get_Is_Searched_All_Nodes(self) -> bool:
+        return self.is_Searched_All_Nodes
+    
+    def set_Is_Searched_All_Nodes(self, bool):
+        self.is_Searched_All_Nodes = bool
+
+    def get_Is_Received_All_Results(self) -> bool:
+        return self.is_Received_All_Results
+
+    def set_Is_Received_All_Results(self, bool):
+        self.is_Received_All_Results = bool
+
+    def search_Task(self, data, wait_until_k_number_found=-1, do_not_check_again=True):
         self.__search_Data = data
         self.__search_History = list()
         self.__found_Node_List = list()
@@ -326,17 +361,17 @@ class Container_Struct(object):
                 "child_node": self.input_Gate,
             }
         )
-        # for node in self.input_Gate.get_Connected_Node_List():
-        #     # Start a thread for each node
-        #     self.__waiting_Node_Cache.append(
-        #         [self.input_Gate, node]
-        #     )
-        
-        # TODO: How to understand all search tasks completed?
-        
-        while wait_For_First_Output_Gate:
-            if len(self.__found_Node_List) > 0:
-                return self.__found_Node_List
+        # Wait until search process to finish or k number found 
+        while not self.is_Received_All_Results:
+            if len(self.__found_Node_List) >= wait_until_k_number_found and wait_until_k_number_found > 0:
+                break
+            if self.get_Is_Searched_All_Nodes():
+                print("Searched all nodes!")
+                self.set_Is_Searched_All_Nodes(False)
+            elif self.get_Is_Received_All_Results():
+                print("Received all nodes!")
+                self.set_Is_Received_All_Results(False)
+                break
         return self.__found_Node_List
 
     def search(self, data):

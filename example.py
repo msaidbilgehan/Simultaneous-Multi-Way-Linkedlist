@@ -18,12 +18,15 @@ print("=== Initialize ===")
 NUMBER_OF_MAX_WORKERS = 10000
 
 seed(time())
-SEARCHED_DATA = -13  # randint(0, 100)
-NODE_LENGTH = 1000  # randint(0, 10000) or cpu_count() * 100
+
+SEARCHED_DATA_1 = -13  # randint(0, 100)
+SEARCHED_DATA_2 = 73  # randint(0, 100)
+
+NODE_LENGTH = 100  # randint(0, 10000) or cpu_count() * 100
 SEARCHED_NODE_INDEX = NODE_LENGTH - randint(1, NODE_LENGTH-1)
 
 # Create a container
-container = Container_Struct(NUMBER_OF_MAX_WORKERS)
+container = Container_Struct(NUMBER_OF_MAX_WORKERS, verbose=True)
 # container.set_Max_Workers(NUMBER_OF_MAX_WORKERS)
 
 print("Max Workers:", container.get_Max_Workers())
@@ -35,7 +38,7 @@ node_layer_4 = container.create_Node(NODE_LENGTH)
 node_layer_2 = container.create_Node(NODE_LENGTH)
 node_layer_6 = container.create_Node(NODE_LENGTH)
 node_layer_7 = container.create_Node(NODE_LENGTH)
-node_layer_5 = container.create_Node(40)
+node_layer_5 = container.create_Node(140)
 node_layer_last = container.create_Node(NODE_LENGTH)
 
 layer_list = [
@@ -96,33 +99,36 @@ for layer in layer_list:
 
 print()
 
-node_layer_last[SEARCHED_NODE_INDEX].set_Data(SEARCHED_DATA)
+node_layer_last[SEARCHED_NODE_INDEX].set_Data(SEARCHED_DATA_1)
 print(
     f"node_layer_last[{SEARCHED_NODE_INDEX}] (id is {node_layer_last[SEARCHED_NODE_INDEX].id}) contains {node_layer_last[SEARCHED_NODE_INDEX].get_Data()}"
 )
-node_layer_7[len(node_layer_7) - 5].set_Data(SEARCHED_DATA)
+node_layer_7[len(node_layer_7) - 5].set_Data(SEARCHED_DATA_1)
 print(
     f"node_layer_7[{len(node_layer_7) - 5}] (id is {node_layer_7[len(node_layer_7) - 5].id}) contains {node_layer_7[len(node_layer_7) - 5].get_Data()}"
 )
-node_layer_2[len(node_layer_2) - 3].set_Data(SEARCHED_DATA)
+node_layer_2[len(node_layer_2) - 43].set_Data(SEARCHED_DATA_2)
 print(
     f"node_layer_2[{len(node_layer_2) - 43}] (id is {node_layer_2[len(node_layer_2) - 43].id}) contains {node_layer_2[len(node_layer_2) - 43].get_Data()}"
 )
-print(f"Looking for data: {SEARCHED_DATA}")
+print(f"Looking for data: {SEARCHED_DATA_1, SEARCHED_DATA_2}")
 
 print("")
 print("===== Multi-Threaded Search =====")
 
 start_time = time()
 # data, wait_until_k_number_found=-1, do_not_check_again=True
-found_node_list = container.search_Task([SEARCHED_DATA], 3, True)
+found_node_list = container.search_Task(
+    [SEARCHED_DATA_1, SEARCHED_DATA_2], 
+    -1, 
+    False
+)
 end_time = time()
 elapsed_time = end_time - start_time
 print('Execution time:', elapsed_time, 'seconds')
 
 print(f"Found {len(found_node_list)} Node")
-for node in found_node_list:
-    print("ID:", node.id)
+print("IDs:", [node.id for node in found_node_list])
 
 _, input_gate, _ = container.get_Struct()
 for found_node in found_node_list:

@@ -22,7 +22,7 @@ seed(time())
 SEARCHED_DATA_1 = -13  # randint(0, 100)
 SEARCHED_DATA_2 = 73  # randint(0, 100)
 
-NODE_LENGTH = 100  # randint(0, 10000) or cpu_count() * 100
+NODE_LENGTH = 10  # randint(0, 10000) or cpu_count() * 100
 SEARCHED_NODE_INDEX = NODE_LENGTH - randint(1, NODE_LENGTH-1)
 
 # Create a container
@@ -38,7 +38,7 @@ node_layer_4 = container.create_Node(NODE_LENGTH)
 node_layer_2 = container.create_Node(NODE_LENGTH)
 node_layer_6 = container.create_Node(NODE_LENGTH)
 node_layer_7 = container.create_Node(NODE_LENGTH)
-node_layer_5 = container.create_Node(140)
+node_layer_5 = container.create_Node(25)
 node_layer_last = container.create_Node(NODE_LENGTH)
 
 layer_list = [
@@ -107,9 +107,9 @@ node_layer_7[len(node_layer_7) - 5].set_Data(SEARCHED_DATA_1)
 print(
     f"node_layer_7[{len(node_layer_7) - 5}] (id is {node_layer_7[len(node_layer_7) - 5].id}) contains {node_layer_7[len(node_layer_7) - 5].get_Data()}"
 )
-node_layer_2[len(node_layer_2) - 43].set_Data(SEARCHED_DATA_2)
+node_layer_2[len(node_layer_2) - 3].set_Data(SEARCHED_DATA_2)
 print(
-    f"node_layer_2[{len(node_layer_2) - 43}] (id is {node_layer_2[len(node_layer_2) - 43].id}) contains {node_layer_2[len(node_layer_2) - 43].get_Data()}"
+    f"node_layer_2[{len(node_layer_2) - 3}] (id is {node_layer_2[len(node_layer_2) - 3].id}) contains {node_layer_2[len(node_layer_2) - 3].get_Data()}"
 )
 print(f"Looking for data: {SEARCHED_DATA_1, SEARCHED_DATA_2}")
 

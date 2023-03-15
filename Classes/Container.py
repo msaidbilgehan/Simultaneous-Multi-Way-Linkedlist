@@ -36,25 +36,28 @@ class Container_Struct(object):
         self.is_Searched_All_Nodes = False
         self.is_Received_All_Results = False
         
-        self.__search_Producer_Thread = Thread(
-            target=self.__search_Task_Producer,
-            args=[
-                self.__waiting_Node_Cache
-            ]
-        )
-
-        # don't hang on exit
-        self.__search_Producer_Thread.setDaemon(True)
-        self.__search_Producer_Thread.start()
+        self.__search_Producer_Thread = None
+        self.__search_Task_Consumer_Thread = None
         
-        self.__search_Task_Consumer_Thread = Thread(
-            target=self.__search_Task_Consumer,
-            args=[]
-        )
+        # self.__search_Producer_Thread = Thread(
+        #     target=self.__search_Task_Producer,
+        #     args=[
+        #         self.__waiting_Node_Cache
+        #     ]
+        # )
 
-        # don't hang on exit
-        self.__search_Task_Consumer_Thread.setDaemon(True)
-        self.__search_Task_Consumer_Thread.start()
+        # # don't hang on exit
+        # self.__search_Producer_Thread.setDaemon(True)
+        # self.__search_Producer_Thread.start()
+        
+        # self.__search_Task_Consumer_Thread = Thread(
+        #     target=self.__search_Task_Consumer,
+        #     args=[]
+        # )
+
+        # # don't hang on exit
+        # self.__search_Task_Consumer_Thread.setDaemon(True)
+        # self.__search_Task_Consumer_Thread.start()
 
     # https://stackoverflow.com/questions/674304/why-is-init-always-called-after-new
     def __new__(cls, max_workers: int | None = None, do_not_check_again: bool = True, verbose: bool = False, *args, **kwargs):
@@ -239,6 +242,12 @@ class Container_Struct(object):
         for node in self.__node_List:
             node.set_Is_Data_Checked(False)
 
+    def __set_search_Thread_Active(self, bool: bool):
+        self.__search_Thread_Active = bool
+        
+    def __get_search_Thread_Active(self):
+        return self.__search_Thread_Active
+
     def __search_Task_Producer(self, waiting_node_cache):
         __total_Checked_Node = 0
 
@@ -353,6 +362,28 @@ class Container_Struct(object):
         self.__found_Node_List = list()
         self.set_Do_Not_Check_Again(do_not_check_again)
         
+        self.__set_search_Thread_Active(True)
+        
+        self.__search_Producer_Thread = Thread(
+            target=self.__search_Task_Producer,
+            args=[
+                self.__waiting_Node_Cache
+            ]
+        )
+
+        # don't hang on exit
+        self.__search_Producer_Thread.setDaemon(True)
+        self.__search_Producer_Thread.start()
+
+        self.__search_Task_Consumer_Thread = Thread(
+            target=self.__search_Task_Consumer,
+            args=[]
+        )
+
+        # don't hang on exit
+        self.__search_Task_Consumer_Thread.setDaemon(True)
+        self.__search_Task_Consumer_Thread.start()
+        
         # Search in connected nodes (input gate)
         self.__waiting_Node_Cache.append(
             {
@@ -380,7 +411,8 @@ class Container_Struct(object):
                 # TODO: If every thread can check the node already checked
                 # How do we know the search run is finished?
                 pass
-            
+        
+        self.__set_search_Thread_Active(False)
         return self.__found_Node_List
 
     def search(self, data):

@@ -22,7 +22,7 @@ seed(time())
 SEARCHED_DATA_1 = -13  # randint(0, 100)
 SEARCHED_DATA_2 = 73  # randint(0, 100)
 
-NODE_LENGTH = 5  # randint(0, 10000) or cpu_count() * 100
+NODE_LENGTH = 100  # randint(0, 10000) or cpu_count() * 100
 SEARCHED_NODE_INDEX = NODE_LENGTH - randint(1, NODE_LENGTH-1)
 
 # Create a container
@@ -119,13 +119,19 @@ print("===== Multi-Threaded Search =====")
 start_time = time()
 # data, wait_until_k_number_found=-1, do_not_check_again=True
 found_node_list = container.search_Task(
-    [SEARCHED_DATA_1, SEARCHED_DATA_2], 
+    [SEARCHED_DATA_1, SEARCHED_DATA_2],
     -1, 
     True
 )
 end_time = time()
 elapsed_time = end_time - start_time
-print('Execution time:', elapsed_time, 'seconds')
+print('Execution time:', elapsed_time, 'seconds for',
+      counter_connections, "connections and", container.get_Node_Number()
+)
+# print("Time for single connection is:",
+#       elapsed_time / counter_connections, "ms")
+# print("Time for single node is:",
+#       elapsed_time / container.get_Node_Number(), "ms")
 
 print(f"Found {len(found_node_list)} Node")
 print("IDs:", [node.id for node in found_node_list])

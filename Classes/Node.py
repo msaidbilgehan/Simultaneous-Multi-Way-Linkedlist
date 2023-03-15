@@ -3,7 +3,7 @@
 # CLASSES
 
 from concurrent.futures import ThreadPoolExecutor
-from threading import Lock, Thread
+from threading import Lock
 # from time import sleep
 # from multiprocessing import cpu_count
 

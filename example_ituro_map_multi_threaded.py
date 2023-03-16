@@ -13,7 +13,7 @@ NODE_ROW_LENGTH = 4  # randint(0, 10000) or cpu_count() * 100
 SEARCHED_NODE_INDEX = NODE_COLUMN_LENGTH - randint(1, NODE_COLUMN_LENGTH-1)
 
 # Create a container
-container = Container_Struct(NUMBER_OF_MAX_WORKERS, verbose=True)
+container = Container_Struct(NUMBER_OF_MAX_WORKERS, verbose=False)
 # container.set_Max_Workers(NUMBER_OF_MAX_WORKERS)
 
 print("Max Workers:", container.get_Max_Workers())
@@ -115,14 +115,18 @@ counter_connections += node_t_connection.connect_Node_BiDirection(nodes_row_4[-1
 node_List, input_Gate, output_Gate = container.get_Struct()
 
 counter_connections += input_Gate.connect_Node_BiDirection(node_start)
-counter_connections += output_Gate.connect_Node_BiDirection(
-    input_Gate
-)
+input_Gate.set_Data("input_Gate")
+output_Gate.set_Data("output_Gate")
+# counter_connections += output_Gate.connect_Node_BiDirection(
+#     input_Gate
+# )
+# print("get_Connection_Number", container.get_Connection_Number())
 
-# for node in node_List:
-#     if len(node.get_Connected_Node_List()) == 0:
-#         print("ID:", node.get_ID(), "=>", node.get_Data())
-# print("")
+print("Unconnected Nodes:")
+for node in container.get_Unconnected_Nodes():
+    if len(node.get_Connected_Node_List()) == 0:
+        print("\t -> ID:", node.get_ID(), "=>", node.get_Data())
+
 # counter_connections += container.connect_Nodes_To_Node(
 #     nodes_row_1,
 #     output_Gate,
@@ -170,6 +174,14 @@ print("Connections:", counter_connections)
 print()
 
 nodes_row_1[0].set_Data(SEARCHED_DATA)
+nodes_row_1[1].set_Data(SEARCHED_DATA)
+nodes_row_2[0].set_Data(SEARCHED_DATA)
+nodes_row_3[0].set_Data(SEARCHED_DATA)
+nodes_row_4[1].set_Data(SEARCHED_DATA)
+nodes_x[0].set_Data(SEARCHED_DATA)
+nodes_y[2].set_Data(SEARCHED_DATA)
+nodes_z[1].set_Data(SEARCHED_DATA)
+nodes_t[1].set_Data(SEARCHED_DATA)
 print(
     f"nodes_row_1[0] (id is {nodes_row_1[0].get_ID()}) contains {nodes_row_1[0].get_Data()}"
 )
@@ -201,8 +213,8 @@ print('Execution time:', elapsed_time, 'seconds for',
 
 print(f"Found {len(found_node_list)} Node")
 
-for i, found_list in enumerate(found_node_list):
-    print(i, "- IDs:", [node.get_ID() for node in found_list])
+# for i, found_list in enumerate(found_node_list):
+#     print(i, "- IDs:", [node.get_ID() for node in found_list])
 
 _, input_gate, _ = container.get_Struct()
 for found_node in found_node_list:

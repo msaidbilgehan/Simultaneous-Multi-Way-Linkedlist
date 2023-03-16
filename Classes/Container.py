@@ -131,11 +131,17 @@ class Container_Struct(object):
         counter_connections += self.connect_to_Output_Gate(output_Gate_Index)
         return counter_connections
         
-    def get_Struct(self):
+    def get_Struct(self) -> tuple:
         return self.__node_List, self.input_Gate, self.output_Gate
     
-    def get_Node_Number(self):
+    def get_Node_Number(self) -> int:
         return len(self.__node_List)
+    
+    def get_Connection_Number(self) -> int:
+        connection = 0
+        for node in self.__node_List:
+            connection += len(node.get_Connected_Node_List())
+        return connection
     
     def get_Blocked_Node_Number(self):
         blocked_Node_Number = 0
@@ -296,6 +302,12 @@ class Container_Struct(object):
                 # Check if there is a result
                 result, node = result_list[-1]
 
+                # DEBUG #
+                # print("node.ID:", node.get_ID())
+                if node.get_ID() == 4:
+                    pass
+                #########
+                
                 __total_Checked_Node += 1
                 if self.is_verbose:
                     print(
@@ -420,6 +432,13 @@ class Container_Struct(object):
 
     def get_Search_History(self):
         return self.__search_History
+
+    def get_Unconnected_Nodes(self) -> list:
+        unconnected_Nodes = list()
+        for node in self.__node_List:
+            if len(node.get_Connected_Node_List()) == 0:
+                unconnected_Nodes.append(node)
+        return unconnected_Nodes
     
     @staticmethod
     def set_Recursion_Limit(value:int=10000):

@@ -75,67 +75,51 @@ print("Blocked Node Number:", container.get_Blocked_Node_Number())
 print("Connections:", counter_connections)
 
 print()
+
 nodes_row_1[0].set_Data(SEARCHED_DATA)
 print(
-    f"nodes_row_1[0] (id is {nodes_row_1[0].id}) contains {nodes_row_1[0].get_Data()}"
+    f"nodes_row_1[0] (id is {nodes_row_1[0].get_ID()}) contains {nodes_row_1[0].get_Data()}"
 )
 print(
     f"Looking for data: {SEARCHED_DATA}"
 )
-# nodes_x[0].set_Data(SEARCHED_DATA)
-# print(
-#     f"nodes_x[0] (id is {nodes_x[0].id}) contains {nodes_x[0].get_Data()}"
-# )
-# print(
-#     f"Looking for data: {SEARCHED_DATA}"
-# )
-
 print("")
-print("===== Sequential Search =====")
-# get the start time
-start_time = time()
-result_queue = container.search(SEARCHED_DATA)
-end_time = time()
-
-elapsed_time = end_time - start_time
-print('Execution time:', elapsed_time, 'seconds')
-
-
-for node in result_queue:
-    if node is not None:
-        print(node.id, end=" > ")
-    else:
-        print("None", end="-")
-print()
-print("Path Length:", len(result_queue))
-
-print("\n")
 print("===== Multi-Threaded Search =====")
 
 start_time = time()
-found_node_list = container.search_Task([SEARCHED_DATA], True, True)
+# data, wait_until_k_number_found=-1, do_not_check_again=True
+found_node_list = container.search_Task(
+    [SEARCHED_DATA],
+    -1,
+    True
+)
 end_time = time()
 elapsed_time = end_time - start_time
-print('Execution time:', elapsed_time, 'seconds')
+print('Execution time:', elapsed_time, 'seconds for',
+      counter_connections, "connections and", container.get_Node_Number()
+      )
+# print("Time for single connection is:",
+#       elapsed_time / counter_connections, "ms")
+# print("Time for single node is:",
+#       elapsed_time / container.get_Node_Number(), "ms")
 
-print(f"Found {len(found_node_list)} different Node Path")
-# for node in found_node_list:
-#     print("ID:", node.id)
+print(f"Found {len(found_node_list)} Node")
+print("IDs:", [node.get_ID() for node in found_node_list])
 
-path_checker_result = container.find_Path_By_Checker_Node(
-    found_node_list[0],
-    input_Gate
-)
-path_checker_result = path_checker_result[:-1]
-path_checker_result = path_checker_result[::-1]
-print("")
-print("Find Path by Checker Result:")
-for step in path_checker_result:
-    print(step.id, end=" > ")
-    
-print()
-print("Path Length:", len(path_checker_result))
-print()
+_, input_gate, _ = container.get_Struct()
+for found_node in found_node_list:
+    path_checker_result = container.find_Path_By_Checker_Node(
+        found_node,
+        input_gate
+    )
+    path_checker_result = path_checker_result[:-1]
+    path_checker_result = path_checker_result[::-1]
+    print("")
+    print("Find Path by Checker Result:")
+    for step in path_checker_result:
+        print(step.get_ID(), end=" > ")
+
+    print("path length:", len(path_checker_result))
 
 # for index, history in enumerate(search_history):
 #     # Pass input gate
@@ -144,12 +128,14 @@ print()
 #     print(
 #         index,
 #         "|",
-#         history["parent_node"].id,
-#         history["child_node"].id,
+#         history["parent_node"].get_ID(),
+#         history["child_node"].get_ID(),
 #         "\t|",
 #         history["parent_node_index"],
 #         "  \t|",
 #         history["result"],
 #     )
+
+container.clean_Checked_Status()
 
 print("")

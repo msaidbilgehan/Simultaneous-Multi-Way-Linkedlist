@@ -67,7 +67,7 @@ for layer in layer_list:
 print()
 node_layer_last[SEARCHED_NODE_INDEX].set_Data(SEARCHED_DATA)
 print(
-    f"node_layer_last[{SEARCHED_NODE_INDEX}] (id is {node_layer_last[SEARCHED_NODE_INDEX].id}) contains {node_layer_last[SEARCHED_NODE_INDEX].get_Data()}"
+    f"node_layer_last[{SEARCHED_NODE_INDEX}] (id is {node_layer_last[SEARCHED_NODE_INDEX].get_ID()}) contains {node_layer_last[SEARCHED_NODE_INDEX].get_Data()}"
 )
 print(f"Looking for data: {SEARCHED_DATA}")
 
@@ -94,7 +94,7 @@ path = path[::-1]
 
 print("Find Path by Checker Result:")
 for node in path:
-    print(node.id, end=" > ")
+    print(node.get_ID(), end=" > ")
 print("\n")
 print("path length:", len(path))
 

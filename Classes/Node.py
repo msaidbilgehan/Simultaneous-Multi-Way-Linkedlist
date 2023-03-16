@@ -23,11 +23,11 @@ class Node_Struct(object):
         else:
             self.connected_Node_List = list()
         
-        self._data = data
-        self._is_Data_Checked = False
+        self.__data = data
+        self.__is_Data_Checked = False
         self.checked_by = None
         
-        self.id = self.id_Counter
+        self.__id = self.id_Counter
         
         # Node Block Status
         self.is_Node_Blocked = is_Node_Blocked
@@ -75,33 +75,36 @@ class Node_Struct(object):
         
     def set_Data(self, data):
         self.__lock.acquire()
-        self._data = data
+        self.__data = data
         self.__lock.release()
 
     def get_Data(self) -> object:
-        return self._data
+        return self.__data
+    
+    def get_ID(self) -> int:
+        return self.__id
     
     def compare_Data(self, data) -> bool:
-        return self._data == data
+        return self.__data == data
     
     def compare_Data_Aware(self, data) -> list:
-        return [self._data == data, self]
+        return [self.__data == data, self]
     
     def compare_Multiple_Data_Aware(self, data_list) -> list:
         for data in data_list:
-            if data == self._data:
+            if data == self.__data:
                 return [True, self]
         return [False, self]
     
     def set_Is_Data_Checked(self, bool, checker_node=None):
-        self._is_Data_Checked = bool
+        self.__is_Data_Checked = bool
         self.checked_by = checker_node
     
     def is_Data_Checked(self):
-        return self._is_Data_Checked
+        return self.__is_Data_Checked
     
     def do_I_Have(self, data, search_history, recursive=True) -> list:
-        if self._data == data:
+        if self.__data == data:
             search_history.append(self)
             return [self]
         elif recursive:
@@ -144,7 +147,7 @@ class Node_Struct(object):
         
     def get_information(self) -> dict:
         return {
-            "ID": self.id,
+            "ID": self.get_ID(),
             "Blocked_Status": self.get_Blocked_Status(),
             "Data": self.get_Data(),
             "Connected_Node_List": self.get_Connected_Node_List(),

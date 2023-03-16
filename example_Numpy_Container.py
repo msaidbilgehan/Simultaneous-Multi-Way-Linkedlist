@@ -1,17 +1,7 @@
 from random import randint, seed
 from time import time
-from Classes.Container import Container_Struct
-# from multiprocessing import cpu_count
-
-
-def save_to_json(path, data, sort_keys=True, indent=4):
-    global json
-    import json
-
-    with open(path, "w") as outfile:
-        json.dump(data, outfile, sort_keys=sort_keys, indent=indent)
-    return 0
-
+from Classes.Container_Numpy import Container_Numpy_Struct
+import numpy as np
 
 print("")
 print("=== Initialize ===")
@@ -26,7 +16,7 @@ NODE_LENGTH = 100  # randint(0, 10000) or cpu_count() * 100
 SEARCHED_NODE_INDEX = NODE_LENGTH - randint(1, NODE_LENGTH-1)
 
 # Create a container
-container = Container_Struct(NUMBER_OF_MAX_WORKERS, verbose=True)
+container = Container_Numpy_Struct(NUMBER_OF_MAX_WORKERS, verbose=True)
 # container.set_Max_Workers(NUMBER_OF_MAX_WORKERS)
 
 print("Max Workers:", container.get_Max_Workers())
@@ -51,12 +41,6 @@ layer_list = [
     node_layer_5,
     node_layer_last
 ]
-# container.create_Node_ID_Map(
-#     node_layers=layer_list
-# )
-# node_ID_Map = container.get_Node_ID_Map()
-# print(node_ID_Map)
-# save_to_json("node_ID_Map.json", node_ID_Map, sort_keys=False, indent=4)
 
 counter_connections = 0
 counter_connections += container.connect_Input_Gate_to_Node_Layer(node_layer_1)
@@ -114,58 +98,59 @@ print(
 print(f"Looking for data: {SEARCHED_DATA_1, SEARCHED_DATA_2}")
 
 print("")
-print("===== Multi-Threaded Search =====")
+
+container.create_Node_ID_Numpy_Mapping()
+numpy_Mapping = container.get_Numpy_Mapping()
 
 start_time = time()
-# data, wait_until_k_number_found=-1, do_not_check_again=True
-found_node_list = container.search_Task(
-    [SEARCHED_DATA_1, SEARCHED_DATA_2],
-    -1, 
-    True
-)
+found_node_np_index = container.contains_Numpy(id=-1, data=SEARCHED_DATA_1)
 end_time = time()
 elapsed_time = end_time - start_time
 print('Execution time:', elapsed_time, 'seconds for',
       counter_connections, "connections and", container.get_Node_Number()
 )
-# print("Time for single connection is:",
-#       elapsed_time / counter_connections, "ms")
-# print("Time for single node is:",
-#       elapsed_time / container.get_Node_Number(), "ms")
+print("found_node_np_index:", found_node_np_index)
+for index in found_node_np_index:
+    for i in index:
+        print("found_nodes:", numpy_Mapping[i])
 
-print(f"Found {len(found_node_list)} Node")
-print("IDs:", [node.get_ID() for node in found_node_list])
+# print("===== Multi-Threaded Search =====")
 
-_, input_gate, _ = container.get_Struct()
-for found_node in found_node_list:
-    path_checker_result = container.find_Path_By_Checker_Node(
-        found_node,
-        input_gate
-    )
-    path_checker_result = path_checker_result[:-1]
-    path_checker_result = path_checker_result[::-1]
-    print("")
-    print("Find Path by Checker Result:")
-    for step in path_checker_result:
-        print(step.get_ID(), end=" > ")
+# start_time = time()
+# # data, wait_until_k_number_found=-1, do_not_check_again=True
+# found_node_list = container.search_Task(
+#     [SEARCHED_DATA_1, SEARCHED_DATA_2],
+#     -1, 
+#     True
+# )
+# end_time = time()
+# elapsed_time = end_time - start_time
+# print('Execution time:', elapsed_time, 'seconds for',
+#       counter_connections, "connections and", container.get_Node_Number()
+# )
+# # print("Time for single connection is:",
+# #       elapsed_time / counter_connections, "ms")
+# # print("Time for single node is:",
+# #       elapsed_time / container.get_Node_Number(), "ms")
 
-    print("path length:", len(path_checker_result))
+# print(f"Found {len(found_node_list)} Node")
+# print("IDs:", [node.id for node in found_node_list])
 
-# for index, history in enumerate(search_history):
-#     # Pass input gate
-#     if index == 0:
-#         continue
-#     print(
-#         index,
-#         "|",
-#         history["parent_node"].get_ID(),
-#         history["child_node"].get_ID(),
-#         "\t|",
-#         history["parent_node_index"],
-#         "  \t|",
-#         history["result"],
+# _, input_gate, _ = container.get_Struct()
+# for found_node in found_node_list:
+#     path_checker_result = container.find_Path_By_Checker_Node(
+#         found_node,
+#         input_gate
 #     )
+#     path_checker_result = path_checker_result[:-1]
+#     path_checker_result = path_checker_result[::-1]
+#     print("")
+#     print("Find Path by Checker Result:")
+#     for step in path_checker_result:
+#         print(step.id, end=" > ")
 
-container.clean_Checked_Status()
+#     print("path length:", len(path_checker_result))
+
+# container.clean_Checked_Status()
 
 print("")

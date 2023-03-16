@@ -58,7 +58,7 @@ for layer in layer_list:
 print()
 node_layer_last[SEARCHED_NODE_INDEX].set_Data(SEARCHED_DATA)
 print(
-    f"node_layer_last[{SEARCHED_NODE_INDEX}] (id is {node_layer_last[SEARCHED_NODE_INDEX].id}) contains {node_layer_last[SEARCHED_NODE_INDEX].get_Data()}"
+    f"node_layer_last[{SEARCHED_NODE_INDEX}] (id is {node_layer_last[SEARCHED_NODE_INDEX].get_ID()}) contains {node_layer_last[SEARCHED_NODE_INDEX].get_Data()}"
 )
 print(f"Looking for data: {SEARCHED_DATA}")
 
@@ -77,7 +77,7 @@ print()
 print("Path Length:", len(result_queue))
 for node in result_queue:
     if node is not None:
-        print(">{}".format(node.id), end="")
+        print(">{}".format(node.get_ID()), end="")
     else:
         print("None", end="-")
         

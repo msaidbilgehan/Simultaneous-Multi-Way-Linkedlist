@@ -50,7 +50,7 @@ print("Connections:", counter_connections)
 print()
 node_layer_list[-1][SEARCHED_NODE_INDEX].set_Data(SEARCHED_DATA)
 print(
-    f"node_layer_list[{SEARCHED_NODE_INDEX}] (id is {node_layer_list[-1][SEARCHED_NODE_INDEX].id}) contains {node_layer_list[-1][SEARCHED_NODE_INDEX].get_Data()}"
+    f"node_layer_list[{SEARCHED_NODE_INDEX}] (id is {node_layer_list[-1][SEARCHED_NODE_INDEX].get_ID()}) contains {node_layer_list[-1][SEARCHED_NODE_INDEX].get_Data()}"
 )
 print(
     f"Looking for data ({len(node_layer_list)}x{SEARCHED_NODE_INDEX + 1}): {SEARCHED_DATA}"
@@ -74,7 +74,7 @@ print(
 # print("Path Length:", len(result_queue))
 # for node in result_queue:
 #     if node is not None:
-#         print(node.id, end=" > ")
+#         print(node.get_ID(), end=" > ")
 #     else:
 #         print("None", end="-")
 
@@ -89,7 +89,7 @@ print('Execution time:', elapsed_time, 'seconds')
 
 print(f"Found {len(found_node_list)} different Node Path")
 for node in found_node_list:
-    print("ID:", node.id)
+    print("ID:", node.get_ID())
 
 _, input_gate, _ = container.get_Struct()
 path_checker_result = container.find_Path_By_Checker_Node(
@@ -101,7 +101,7 @@ path_checker_result = path_checker_result[::-1]
 print("")
 print("Find Path by Checker Result:")
 for step in path_checker_result:
-    print(step.id, end=" > ")
+    print(step.get_ID(), end=" > ")
 
 print("\n")
 
@@ -112,8 +112,8 @@ print("\n")
 #     print(
 #         index,
 #         "|",
-#         history["parent_node"].id,
-#         history["child_node"].id,
+#         history["parent_node"].get_ID(),
+#         history["child_node"].get_ID(),
 #         "\t|",
 #         history["parent_node_index"],
 #         "  \t|",

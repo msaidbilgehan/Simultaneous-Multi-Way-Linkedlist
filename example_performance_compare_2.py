@@ -74,7 +74,7 @@ for layer in layer_list:
 print()
 node_layer_last[SEARCHED_NODE_INDEX].set_Data(SEARCHED_DATA)
 print(
-    f"node_layer_last[{SEARCHED_NODE_INDEX}] (id is {node_layer_last[SEARCHED_NODE_INDEX].id}) contains {node_layer_last[SEARCHED_NODE_INDEX].get_Data()}"
+    f"node_layer_last[{SEARCHED_NODE_INDEX}] (id is {node_layer_last[SEARCHED_NODE_INDEX].get_ID()}) contains {node_layer_last[SEARCHED_NODE_INDEX].get_Data()}"
 )
 print(f"Looking for data: {SEARCHED_DATA}")
 
@@ -94,7 +94,7 @@ print()
 print("Path Length:", len(result_queue))
 for node in result_queue:
     if node is not None:
-        print(node.id, end=" > ")
+        print(node.get_ID(), end=" > ")
     else:
         print("None", end="-")
 print("")
@@ -111,7 +111,7 @@ print('Execution time:', elapsed_time, 'seconds')
 
 print(f"Found {len(found_node_list)} different Node Path")
 for node in found_node_list:
-    print("ID:", node.id, "| Data:", node.get_Data())
+    print("ID:", node.get_ID(), "| Data:", node.get_Data())
 
 # search_history = container.get_Search_History()
 
@@ -119,7 +119,7 @@ for node in found_node_list:
 
 # for step in path:
 #     parent_node, child_node, parent_index, result = step.values()
-#     print(child_node.id, end=" > ")
+#     print(child_node.get_ID(), end=" > ")
 
 _, input_gate, _ = container.get_Struct()
 
@@ -131,7 +131,7 @@ path = path[:-1]
 path = path[::-1]
 
 for node in path:
-    print(node.id, end=" > ")
+    print(node.get_ID(), end=" > ")
 print()
 print("path length:", len(path))
 
@@ -142,8 +142,8 @@ print("path length:", len(path))
 #     print(
 #         index,
 #         "|",
-#         history["parent_node"].id,
-#         history["child_node"].id,
+#         history["parent_node"].get_ID(),
+#         history["child_node"].get_ID(),
 #         "\t|",
 #         history["parent_node_index"],
 #         "  \t|",

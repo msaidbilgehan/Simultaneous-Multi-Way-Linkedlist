@@ -57,5 +57,5 @@ print("Blocked Node Number:", container.get_Blocked_Node_Number())
 print()
 node_pack_last[SEARCHED_NODE_INDEX].set_Data(SEARCHED_DATA)
 print(
-    f"node_pack_last[{SEARCHED_NODE_INDEX}] (id is {node_pack_last[SEARCHED_NODE_INDEX].id}) contains {node_pack_last[SEARCHED_NODE_INDEX].get_Data()}"
+    f"node_pack_last[{SEARCHED_NODE_INDEX}] (id is {node_pack_last[SEARCHED_NODE_INDEX].get_ID()}) contains {node_pack_last[SEARCHED_NODE_INDEX].get_Data()}"
 )

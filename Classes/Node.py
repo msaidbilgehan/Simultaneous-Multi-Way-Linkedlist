@@ -45,14 +45,27 @@ class Node_Struct(object):
         Node_Struct.id_Counter += 1
         return super(Node_Struct, cls).__new__(cls, *args, **kwargs)
     
-    def connect_Two_Way_Node(self, node) -> int:
-        self.connected_Node_List.append(node)
-        node.connected_Node_List.append(self)
+    def connect_Node_BiDirection(self, node) -> int:
+        if type(node) is Node_Struct or type(node) is not list:
+            if self is not node:
+                self.connected_Node_List.append(node)
+                node.connected_Node_List.append(self)
+            else:
+                raise(Exception("Node can not be connected to itself!"))
+        else:
+            raise (
+                Exception(f"Only Node type is accepted (given {type(node)})!")
+            )
         return 2
 
     def disconnect_Two_Way_Node(self, node) -> int:
-        self.connected_Node_List.remove(node)
-        node.connected_Node_List.remove(self)
+        if type(node) is Node_Struct or type(node) is not list:
+            self.connected_Node_List.remove(node)
+            node.connected_Node_List.remove(self)
+        else:
+            raise (
+                Exception(f"Only Node type is accepted (given {type(node)})!")
+            )
         return 2
 
     def connect_To_Node(self, node) -> int:

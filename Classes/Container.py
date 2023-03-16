@@ -38,26 +38,6 @@ class Container_Struct(object):
         
         self.__search_Producer_Thread = None
         self.__search_Task_Consumer_Thread = None
-        
-        # self.__search_Producer_Thread = Thread(
-        #     target=self.__search_Task_Producer,
-        #     args=[
-        #         self.__waiting_Node_Cache
-        #     ]
-        # )
-
-        # # don't hang on exit
-        # self.__search_Producer_Thread.setDaemon(True)
-        # self.__search_Producer_Thread.start()
-        
-        # self.__search_Task_Consumer_Thread = Thread(
-        #     target=self.__search_Task_Consumer,
-        #     args=[]
-        # )
-
-        # # don't hang on exit
-        # self.__search_Task_Consumer_Thread.setDaemon(True)
-        # self.__search_Task_Consumer_Thread.start()
 
     # https://stackoverflow.com/questions/674304/why-is-init-always-called-after-new
     def __new__(cls, max_workers: int | None = None, do_not_check_again: bool = True, verbose: bool = False, *args, **kwargs):
@@ -166,58 +146,54 @@ class Container_Struct(object):
 
     @staticmethod
     def connect_Nodes_As_Sequential(nodes, bi_direction=True) -> int:
-        connections = 0
+        connection = 0
         for i in range(len(nodes) - 1):
-            nodes[i].connect_To_Node(nodes[i+1])
-            connections += 1
             if bi_direction:
-                nodes[i+1].connect_To_Node(nodes[i])
-                connections += 1
-        return connections
+                connection += nodes[i].connect_Node_BiDirection(nodes[i+1])
+            else:
+                connection += nodes[i].connect_To_Node(nodes[i+1])
+        return connection
 
     @staticmethod
     def connect_Nodes_One_O_One(layer_1, layer_2, bi_direction=True) -> int:
         connections = 0
         for i in range(len(layer_1)):
-            connections += 1
-            layer_1[i].connect_To_Node(
-                layer_2[i]
-            )
             if bi_direction:
-                layer_2[i].connect_To_Node(
-                    layer_1[i]
+                connections += layer_1[i].connect_Node_BiDirection(
+                    layer_2[i]
                 )
-                connections += 1
+            else:
+                connections += layer_1[i].connect_To_Node(
+                    layer_2[i]
+                )
         return connections
 
     @staticmethod
     def connect_Nodes_To_Node(from_nodes, to_node, bi_direction=True) -> int:
         connections = 0
         for node in from_nodes:
-            node.connect_To_Node(
-                to_node
-            )
-            connections += 1
             if bi_direction:
-                to_node.connect_To_Node(
-                    node
+                connections += node.connect_Node_BiDirection(
+                    to_node
                 )
-                connections += 1
+            else:
+                connections += node.connect_To_Node(
+                    to_node
+                )
         return connections
 
     @staticmethod
     def connect_Node_To_Nodes(from_node, to_nodes, bi_direction=True) -> int:
         connections = 0
         for node in to_nodes:
-            node.connect_To_Node(
-                from_node
-            )
-            connections += 1
             if bi_direction:
-                from_node.connect_To_Node(
+                connections += from_node.connect_Node_BiDirection(
                     node
                 )
-                connections += 1
+            else:
+                connections += from_node.connect_To_Node(
+                    node
+                )
         return connections
 
     def connect_Node_As_Ordered(self) -> int:
@@ -287,7 +263,8 @@ class Container_Struct(object):
                     #         end="\r"
                     #     )
                     child_node.set_Is_Data_Checked(True, parent_node)
-                    
+
+
                     for neighbor in child_node.get_Connected_Node_List():
                         waiting_node_cache.append(
                             {
@@ -318,6 +295,7 @@ class Container_Struct(object):
                 result_list.append(result_thread.result())
                 # Check if there is a result
                 result, node = result_list[-1]
+
                 __total_Checked_Node += 1
                 if self.is_verbose:
                     print(
@@ -438,12 +416,7 @@ class Container_Struct(object):
             for thread in thread_list:
                 result_list.append(thread.result())
                 
-            # Check if there is a result
-            for result in result_list:
-                if result != [None]:
-                    return result
-                
-        return [None]
+        return result_list
 
     def get_Search_History(self):
         return self.__search_History

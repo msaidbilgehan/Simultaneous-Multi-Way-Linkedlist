@@ -441,7 +441,6 @@ class Container_Struct(object):
             # Check if there is a result
             for result in result_list:
                 if result != [None]:
-                    result.append(self)
                     return result
                 
         return [None]

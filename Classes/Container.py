@@ -91,10 +91,10 @@ class Container_Struct(object):
         self.__node_array_map.append([self.output_Gate])
     
     def create_Node_ID_Map(self, node_layers):
-        self.__node_id_array_map.append([self.input_Gate.id])
+        self.__node_id_array_map.append([self.input_Gate.get_ID()])
         for node_layer in node_layers:
-            self.__node_id_array_map.append([node.id for node in node_layer])
-        self.__node_id_array_map.append([self.output_Gate.id])
+            self.__node_id_array_map.append([node.get_ID() for node in node_layer])
+        self.__node_id_array_map.append([self.output_Gate.get_ID()])
     
     def get_Node_Map(self):
         return self.__node_array_map
@@ -211,7 +211,7 @@ class Container_Struct(object):
             )
             # debug_node = None
             for i in range(0, len(self.__node_List) - 1):
-                # print(i, self.__node_List[i].id)
+                # print(i, self.__node_List[i].get_ID())
                 self.__node_List[i].connect_To_Node(self.__node_List[i + 1])
                 counter_connections += 1
                 # debug_node = self.__node_List[i]
@@ -426,7 +426,15 @@ class Container_Struct(object):
                 
             # Wait for all threads to finish
             for thread in thread_list:
-                result_list.append(thread.result())
+                result = thread.result()
+                if result != [None]:
+                    result_list.append(thread.result())
+                
+            # result_list = [
+            #     result for result_list 
+            #     in result_list 
+            #     if result != [None] else pass
+            # ]
                 
         return result_list
 
@@ -468,7 +476,7 @@ class Container_Struct(object):
         
         while True:
             path.append(current_Node)
-            # print(current_Node.id, end="\r")
+            # print(current_Node.get_ID(), end="\r")
             if current_Node is not input_Gate:
                 current_Node = current_Node.checked_by
             else:

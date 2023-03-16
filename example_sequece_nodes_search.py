@@ -74,12 +74,15 @@ print('Execution time:', elapsed_time, 'seconds')
 # print("Result Queue:", result_queue)
 print()
 
-print("Path Length:", len(result_queue))
-for node in result_queue:
-    if node is not None:
-        print(">{}".format(node.get_ID()), end="")
+for node_path in result_queue:
+    if node_path != [None]:
+        print("Path Length:", len(node_path))
+        for node in node_path:
+            if node is not None:
+                print(node.get_ID(), end=" > ")
+            else:
+                print("None", end="-")
     else:
-        print("None", end="-")
-        
+        continue
 print("")
 

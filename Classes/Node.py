@@ -158,7 +158,7 @@ class Node_Struct(object):
         else:
             return [None]
         
-    def get_information(self) -> dict:
+    def get_Information(self) -> dict:
         return {
             "ID": self.get_ID(),
             "Blocked_Status": self.get_Blocked_Status(),

@@ -5,6 +5,7 @@ import sys
 from time import sleep
 from Classes.Gate import Gate_Struct
 from Classes.Node import Node_Struct
+from Classes.Node_PC import Node_Point_Cloud_Struct
 from Classes.Search_History import Search_History_List_Struct
 
 
@@ -68,10 +69,10 @@ class Container_Struct(object):
     def get_Max_Workers(self):
         return self.__max_Workers
     
-    def create_Node(self, number=1) -> list:
+    def create_Node(self, number=1, is_point_cloud = False) -> list:
         node_list = list()
         for _ in range(number):
-            node = Node_Struct()
+            node = Node_Point_Cloud_Struct() if is_point_cloud else Node_Struct()
             node_list.append(node)
         self.__node_List += node_list
         return node_list

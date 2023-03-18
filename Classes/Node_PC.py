@@ -88,7 +88,8 @@ class Node_Point_Cloud_Struct(Node_Struct):
     def get_Information_3D(self):
         return {
             "coordinates": self.get_Coordinate(),
-            "color": self.get_Color()
+            "color": self.get_Color(),
+            "connected_coordinates": [node.get_Coordinate() for node in self.get_Connected_Node_List()]
         }
 
     def connect_Node_BiDirection(self, node, x = None, y = None, z = None) -> int:

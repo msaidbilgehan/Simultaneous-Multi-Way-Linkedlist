@@ -63,6 +63,7 @@ print()
 # https://medium.com/swlh/python-data-visualization-with-matplotlib-for-absolute-beginner-part-iii-three-dimensional-8284df93dfab
 node_list, input_gate, output_Gate = container.get_Struct()
 
+nodes_ID_information = [node.get_ID() for node in node_list]
 nodes_3D_information = [node.get_Information_3D() for node in node_list]
 location_data = [
     node_3D["coordinates"]
@@ -84,6 +85,9 @@ ax = plt.axes(projection='3d')
 
 # Visualize 3D scatter plot
 ax.scatter3D(xdata, ydata, zdata, c=zdata, cmap='jet')
+
+for i, id in enumerate(nodes_ID_information):
+    ax.text(xdata[i], ydata[i], zdata[i], id, color='red')
 
 # Visualize Connections
 for i, ld_connected_nodes in enumerate(location_data_connected):

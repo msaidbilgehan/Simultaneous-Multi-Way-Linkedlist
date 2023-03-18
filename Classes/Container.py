@@ -3,6 +3,10 @@ from concurrent.futures import ThreadPoolExecutor
 from threading import Thread
 import sys
 from time import sleep
+
+import matplotlib.pyplot as plt
+import numpy as np
+
 from Classes.Gate import Gate_Struct, Gate_Point_Cloud_Struct
 from Classes.Node import Node_Struct
 from Classes.Node_PC import Node_Point_Cloud_Struct
@@ -454,6 +458,53 @@ class Container_Struct(object):
                 unconnected_Nodes.append(node)
         return unconnected_Nodes
     
+    def plot3D(self):
+
+        # https://medium.com/swlh/python-data-visualization-with-matplotlib-for-absolute-beginner-part-iii-three-dimensional-8284df93dfab
+
+        nodes_ID_information = [node.get_ID() for node in self.__node_List]
+        nodes_3D_information = [node.get_Information_3D() for node in self.__node_List]
+        location_data = [
+            node_3D["coordinates"]
+            for node_3D in nodes_3D_information
+        ]
+        location_data_connected = [
+            node_3D["connected_coordinates"]
+            for node_3D in nodes_3D_information
+        ]
+
+        xdata = [ld[0] for ld in location_data]
+        ydata = [ld[1] for ld in location_data]
+        zdata = [ld[2] for ld in location_data]
+
+        fig = plt.figure(figsize=(9, 6))
+
+        # Create 3D container
+        ax = plt.axes(projection='3d')
+
+        # Visualize 3D scatter plot
+        ax.scatter3D(xdata, ydata, zdata, c=zdata, cmap='jet')
+
+        for i, id in enumerate(nodes_ID_information):
+            ax.text(xdata[i], ydata[i], zdata[i], id, color='red')
+
+        # Visualize Connections
+        for i, ld_connected_nodes in enumerate(location_data_connected):
+            for ld_connected in ld_connected_nodes:
+                x_line = np.linspace(xdata[i], ld_connected[0], 2)
+                y_line = np.linspace(ydata[i], ld_connected[1], 2)
+                z_line = np.linspace(zdata[i], ld_connected[2], 2)
+                ax.plot3D(x_line, y_line, z_line, 'blue')
+
+        # Give labels
+        ax.set_xlabel('x')
+        ax.set_ylabel('y')
+        ax.set_zlabel('z')
+
+        # Save figure
+        plt.show()
+        # plt.savefig('3d_scatter.png', dpi=300)
+    
     @staticmethod
     def set_Recursion_Limit(value:int=10000):
         sys.setrecursionlimit(value)
@@ -489,3 +540,4 @@ class Container_Struct(object):
                 path.append(current_Node)
                 break
         return path
+

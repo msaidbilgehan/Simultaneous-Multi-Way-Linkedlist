@@ -43,6 +43,18 @@ class Node_Point_Cloud_Struct(Node_Struct):
         self.coordinate_y = y
         self.coordinate_z = z
         return 1
+    
+    def set_Coordinate_X(self, coord: int) -> int:
+        self.coordinate_x = coord
+        return 1
+    
+    def set_Coordinate_Y(self, coord: int) -> int:
+        self.coordinate_y = coord
+        return 1
+
+    def set_Coordinate_Z(self, coord: int) -> int:
+        self.coordinate_z = coord
+        return 1
 
     def get_Coordinate(self) -> tuple:
         return self.coordinate_x, self.coordinate_y, self.coordinate_z
@@ -78,3 +90,29 @@ class Node_Point_Cloud_Struct(Node_Struct):
             "coordinates": self.get_Coordinate(),
             "color": self.get_Color()
         }
+
+    def connect_Node_BiDirection(self, node, x = None, y = None, z = None) -> int:
+        if super().connect_Node_BiDirection(node):
+            parent_x, parent_y, parent_z = node.get_Coordinate()
+            if x == None:
+                self.set_Coordinate_X(parent_x + 10)
+            if y == None:
+                self.set_Coordinate_Y(parent_y + 10)
+            if z == None:
+                self.set_Coordinate_Z(parent_z + 10)
+            return 1
+        else:
+            return -1
+
+    def connect_To_Node(self, node, x=None, y=None, z=None, tolerance:int=10) -> int:
+        if super().connect_To_Node(node):
+            parent_x, parent_y, parent_z = node.get_Coordinate()
+            if x == None:
+                self.set_Coordinate_X(parent_x + tolerance)
+            if y == None:
+                self.set_Coordinate_Y(parent_y + tolerance)
+            if z == None:
+                self.set_Coordinate_Z(parent_z + tolerance)
+            return 1
+        else:
+            return -1

@@ -1,5 +1,6 @@
 
 from Classes.Node import Node_Struct
+from Classes.Node_PC import Node_Point_Cloud_Struct
 
 
 class Gate_Struct(Node_Struct):
@@ -22,3 +23,7 @@ class Gate_Struct(Node_Struct):
     def add_Input(self, input):
         self.input_List.append(input)
         
+
+class Gate_Point_Cloud_Struct(Gate_Struct, Node_Point_Cloud_Struct):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)

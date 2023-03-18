@@ -3,7 +3,7 @@ from concurrent.futures import ThreadPoolExecutor
 from threading import Thread
 import sys
 from time import sleep
-from Classes.Gate import Gate_Struct
+from Classes.Gate import Gate_Struct, Gate_Point_Cloud_Struct
 from Classes.Node import Node_Struct
 from Classes.Node_PC import Node_Point_Cloud_Struct
 from Classes.Search_History import Search_History_List_Struct
@@ -12,13 +12,17 @@ from Classes.Search_History import Search_History_List_Struct
 class Container_Struct(object):
     id_counter = 0
 
-    def __init__(self, max_workers:int|None=None, do_not_check_again:bool=True, verbose:bool=False):
+    def __init__(self, max_workers: int | None = None, do_not_check_again: bool = True, is_point_cloud: bool = False, verbose: bool = False):
 
         self.id = self.id_counter
         self.is_verbose = verbose
         
-        self.input_Gate = Gate_Struct()
-        self.output_Gate = Gate_Struct()
+        if is_point_cloud:
+            self.input_Gate = Gate_Point_Cloud_Struct()
+            self.output_Gate = Gate_Point_Cloud_Struct()
+        else:
+            self.input_Gate = Gate_Struct()
+            self.output_Gate = Gate_Struct()
         
         self.__node_array_map = list()
         self.__node_id_array_map = list()
@@ -41,7 +45,7 @@ class Container_Struct(object):
         self.__search_Task_Consumer_Thread = None
 
     # https://stackoverflow.com/questions/674304/why-is-init-always-called-after-new
-    def __new__(cls, max_workers: int | None = None, do_not_check_again: bool = True, verbose: bool = False, *args, **kwargs):
+    def __new__(cls, max_workers: int | None = None, do_not_check_again: bool = True, is_point_cloud: bool = False, verbose: bool = False, *args, **kwargs):
         # Node ID
         # cls.id_counter += 1
         Container_Struct.id_counter += 1
@@ -81,29 +85,11 @@ class Container_Struct(object):
         self.input_Gate.connect_To_Node(self.__node_List[index])
         return 1
     
-    def connect_to_Output_Gate(self, index) -> int:
+    def connect_to_Output_Gate(self, index, is_point_cloud=False) -> int:
         self.__node_List[index].connect_To_Node(self.output_Gate)
         return 1
 
-    def create_Node_Map(self, node_layers):
-        self.__node_array_map.append([self.input_Gate])
-        for node_layer in node_layers:
-            self.__node_array_map.append(node_layer)
-        self.__node_array_map.append([self.output_Gate])
-    
-    def create_Node_ID_Map(self, node_layers):
-        self.__node_id_array_map.append([self.input_Gate.get_ID()])
-        for node_layer in node_layers:
-            self.__node_id_array_map.append([node.get_ID() for node in node_layer])
-        self.__node_id_array_map.append([self.output_Gate.get_ID()])
-    
-    def get_Node_Map(self):
-        return self.__node_array_map
-    
-    def get_Node_ID_Map(self):
-        return self.__node_id_array_map
-    
-    def connect_Node_Layers(self, node_layer_1, node_layer_2) -> int:
+    def connect_Node_Layers(self, node_layer_1, node_layer_2, is_point_cloud=False) -> int:
         counter_connections = 0
         for layer_1_node in node_layer_1:
             for layer_2_node in node_layer_2:
@@ -132,25 +118,6 @@ class Container_Struct(object):
         counter_connections += self.connect_to_Output_Gate(output_Gate_Index)
         return counter_connections
         
-    def get_Struct(self) -> tuple:
-        return self.__node_List, self.input_Gate, self.output_Gate
-    
-    def get_Node_Number(self) -> int:
-        return len(self.__node_List)
-    
-    def get_Connection_Number(self) -> int:
-        connection = 0
-        for node in self.__node_List:
-            connection += len(node.get_Connected_Node_List())
-        return connection
-    
-    def get_Blocked_Node_Number(self):
-        blocked_Node_Number = 0
-        for node in self.__node_List:
-            if node.get_Blocked_Status():
-                blocked_Node_Number += 1
-        return blocked_Node_Number
-
     @staticmethod
     def connect_Nodes_As_Sequential(nodes, bi_direction=True) -> int:
         connection = 0
@@ -220,6 +187,44 @@ class Container_Struct(object):
         else:
             raise Exception("Node number must be greater than 2")
             return 0
+
+    def create_Node_Map(self, node_layers):
+        self.__node_array_map.append([self.input_Gate])
+        for node_layer in node_layers:
+            self.__node_array_map.append(node_layer)
+        self.__node_array_map.append([self.output_Gate])
+
+    def create_Node_ID_Map(self, node_layers):
+        self.__node_id_array_map.append([self.input_Gate.get_ID()])
+        for node_layer in node_layers:
+            self.__node_id_array_map.append(
+                [node.get_ID() for node in node_layer])
+        self.__node_id_array_map.append([self.output_Gate.get_ID()])
+
+    def get_Node_Map(self):
+        return self.__node_array_map
+
+    def get_Node_ID_Map(self):
+        return self.__node_id_array_map
+
+    def get_Struct(self) -> tuple:
+        return self.__node_List, self.input_Gate, self.output_Gate
+
+    def get_Node_Number(self) -> int:
+        return len(self.__node_List)
+
+    def get_Connection_Number(self) -> int:
+        connection = 0
+        for node in self.__node_List:
+            connection += len(node.get_Connected_Node_List())
+        return connection
+
+    def get_Blocked_Node_Number(self):
+        blocked_Node_Number = 0
+        for node in self.__node_List:
+            if node.get_Blocked_Status():
+                blocked_Node_Number += 1
+        return blocked_Node_Number
 
     def clean_Checked_Status(self):
         for node in self.__node_List:

@@ -178,7 +178,7 @@ for i, id in enumerate(nodes_ID_information):
 plt.show()
 
 f = r"animation.gif"
-writer_gif = animation.PillowWriter(fps=60)
+writer_gif = animation.PillowWriter(fps=30)
 anim.save(f, writer=writer_gif)
 
 # f = r"animation.mp4"

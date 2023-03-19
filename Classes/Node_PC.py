@@ -92,28 +92,30 @@ class Node_Point_Cloud_Struct(Node_Struct):
             "connected_coordinates": [node.get_Coordinate() for node in self.get_Connected_Node_List()]
         }
 
-    def connect_Node_BiDirection(self, node, x = None, y = None, z = None) -> int:
+    def connect_Node_BiDirection(self, node, relocate: bool = False, x=None, y=None, z=None) -> int:
         if super().connect_Node_BiDirection(node):
-            parent_x, parent_y, parent_z = node.get_Coordinate()
-            if x == None:
-                self.set_Coordinate_X(parent_x)
-            if y == None:
-                self.set_Coordinate_Y(parent_y)
-            if z == None:
-                self.set_Coordinate_Z(parent_z)
+            if relocate:
+                parent_x, parent_y, parent_z = node.get_Coordinate()
+                if x == None:
+                    self.set_Coordinate_X(parent_x)
+                if y == None:
+                    self.set_Coordinate_Y(parent_y)
+                if z == None:
+                    self.set_Coordinate_Z(parent_z)
             return 1
         else:
             return -1
 
-    def connect_To_Node(self, node, x=None, y=None, z=None) -> int:
+    def connect_To_Node(self, node, relocate: bool = False, x=None, y=None, z=None) -> int:
         if super().connect_To_Node(node):
-            parent_x, parent_y, parent_z = node.get_Coordinate()
-            if x == None:
-                self.set_Coordinate_X(parent_x)
-            if y == None:
-                self.set_Coordinate_Y(parent_y)
-            if z == None:
-                self.set_Coordinate_Z(parent_z)
+            if relocate:
+                parent_x, parent_y, parent_z = node.get_Coordinate()
+                if x == None:
+                    self.set_Coordinate_X(parent_x)
+                if y == None:
+                    self.set_Coordinate_Y(parent_y)
+                if z == None:
+                    self.set_Coordinate_Z(parent_z)
             return 1
         else:
             return -1

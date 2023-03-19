@@ -120,16 +120,6 @@ for i, ld in enumerate(location_data):
             )
         )
 
-# for i, ldc_pack in enumerate(location_data_connected):
-#     for ldc in ldc_pack:
-#         walks.append(
-#             walk(
-#                 start_pos=location_data[i],
-#                 end_pos=ldc,
-#                 num_steps=num_steps
-#             )
-#         )
-
 # Attaching 3D axis to the figure
 # fig = plt.figure(figsize=(9, 6))
 fig = plt.figure(figsize=(10, 7))
@@ -177,9 +167,8 @@ for i, id in enumerate(nodes_ID_information):
 # Show figure
 plt.show()
 
-f = r"animation.gif"
 writer_gif = animation.PillowWriter(fps=30)
-anim.save(f, writer=writer_gif)
+anim.save(r"animation.gif", writer=writer_gif)
 
 # f = r"animation.mp4"
 # writer_video = animation.FFMpegWriter(fps=60)

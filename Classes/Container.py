@@ -5,6 +5,7 @@ import sys
 from time import sleep
 
 import matplotlib.pyplot as plt
+import matplotlib.animation as animation
 import numpy as np
 
 from Classes.Gate import Gate_Struct, Gate_Point_Cloud_Struct
@@ -20,18 +21,20 @@ class Container_Struct(object):
 
         self.id = self.id_counter
         self.is_verbose = verbose
-        
+        self.__node_List = list()
+
         if is_point_cloud:
             self.input_Gate = Gate_Point_Cloud_Struct()
             self.output_Gate = Gate_Point_Cloud_Struct()
         else:
             self.input_Gate = Gate_Struct()
             self.output_Gate = Gate_Struct()
-        
+        self.__node_List.append(self.input_Gate)
+        self.__node_List.append(self.output_Gate)
+
         self.__node_array_map = list()
         self.__node_id_array_map = list()
         
-        self.__node_List = list()
         self.__search_History = Search_History_List_Struct()
         self.__search_Data_List = list()
         self.__found_Node_List = list()
@@ -458,7 +461,21 @@ class Container_Struct(object):
                 unconnected_Nodes.append(node)
         return unconnected_Nodes
     
-    def plot3D(self):
+    def plot3D(self, save_gif=False):
+
+        def walk(start_pos=(0, 0, 0), end_pos=(0, 0, 0), num_steps=100):
+            steps = np.linspace(start_pos, end_pos, num_steps)
+            # walk = start_pos + np.cumsum(steps, axis=0)
+            # walk = np.array([start_pos + step for step in steps], dtype=np.float64)
+            walk = np.array(steps, dtype=np.float64)
+            return walk
+
+        def update_lines(num, walks, lines):
+            for line, walk in zip(lines, walks):
+                # NOTE: there is no .set_data() for 3 dim data...
+                line.set_data(walk[:num, :2].T)
+                line.set_3d_properties(walk[:num, 2])
+            return lines
 
         # https://medium.com/swlh/python-data-visualization-with-matplotlib-for-absolute-beginner-part-iii-three-dimensional-8284df93dfab
 
@@ -477,24 +494,57 @@ class Container_Struct(object):
         ydata = [ld[1] for ld in location_data]
         zdata = [ld[2] for ld in location_data]
 
-        fig = plt.figure(figsize=(9, 6))
+        # Data: walks as arrays
+        walks = list()
+        num_steps = 100
 
-        # Create 3D container
-        ax = plt.axes(projection='3d')
+        for i, ld in enumerate(location_data):
+            for ldc in location_data_connected[i]:
+                walks.append(
+                    walk(
+                        start_pos=ld,
+                        end_pos=ldc,
+                        num_steps=num_steps
+                    )
+                )
+
+        # Attaching 3D axis to the figure
+        fig = plt.figure(figsize=(10, 7))
+        ax = fig.add_subplot(projection="3d")
+
+        # Create lines initially without data
+        lines = [ax.plot([], [], [])[0] for _ in walks]
+
+        # Setting the axes properties
+        ax.set(xlim3d=(0, 1), xlabel='X')
+        ax.set(ylim3d=(0, 1), ylabel='Y')
+        ax.set(zlim3d=(0, 1), zlabel='Z')
+
+        # Creating the Animation object
+        anim = animation.FuncAnimation(
+            fig,
+            update_lines,
+            num_steps,
+            fargs=(walks, lines),
+            interval=100,
+            repeat=False
+        )
 
         # Visualize 3D scatter plot
-        ax.scatter3D(xdata, ydata, zdata, c=zdata, cmap='jet')
+        ax.scatter3D(xdata, ydata, zdata, c=zdata, cmap='jet', s=70)
+        ax.view_init(elev=25, azim=-30)
+        ax.autoscale(enable=True, axis='both', tight=None)
 
         for i, id in enumerate(nodes_ID_information):
             ax.text(xdata[i], ydata[i], zdata[i], id, color='red')
 
         # Visualize Connections
-        for i, ld_connected_nodes in enumerate(location_data_connected):
-            for ld_connected in ld_connected_nodes:
-                x_line = np.linspace(xdata[i], ld_connected[0], 2)
-                y_line = np.linspace(ydata[i], ld_connected[1], 2)
-                z_line = np.linspace(zdata[i], ld_connected[2], 2)
-                ax.plot3D(x_line, y_line, z_line, 'blue')
+        # for i, ld_connected_nodes in enumerate(location_data_connected):
+        #     for ld_connected in ld_connected_nodes:
+        #         x_line = np.linspace(xdata[i], ld_connected[0], 2)
+        #         y_line = np.linspace(ydata[i], ld_connected[1], 2)
+        #         z_line = np.linspace(zdata[i], ld_connected[2], 2)
+        #         ax.plot3D(x_line, y_line, z_line, 'blue')
 
         # Give labels
         ax.set_xlabel('x')
@@ -504,6 +554,10 @@ class Container_Struct(object):
         # Save figure
         plt.show()
         # plt.savefig('3d_scatter.png', dpi=300)
+        
+        if save_gif:
+            writer_gif = animation.PillowWriter(fps=30)
+            anim.save(r"animation.gif", writer=writer_gif)
     
     @staticmethod
     def set_Recursion_Limit(value:int=10000):

@@ -92,11 +92,12 @@ print('Execution time:', elapsed_time, 'seconds')
 print()
 
 print("Path Length:", len(result_queue))
-for node in result_queue:
-    if node is not None:
-        print(node.get_ID(), end=" > ")
-    else:
-        print("None", end="-")
+for node_pack in result_queue:
+    for node in node_pack:
+        if node is not None:
+            print(node.get_ID(), end=" > ")
+        else:
+            print("None", end="-")
 print("")
 
 
@@ -104,7 +105,7 @@ print("")
 print("===== Multi-Threaded Search =====")
 
 start_time = time()
-found_node_list = container.search_Task(SEARCHED_DATA, True, True)
+found_node_list = container.search_Task([SEARCHED_DATA], True, True)
 end_time = time()
 elapsed_time = end_time - start_time
 print('Execution time:', elapsed_time, 'seconds')

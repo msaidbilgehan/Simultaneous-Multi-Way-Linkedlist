@@ -461,7 +461,7 @@ class Container_Struct(object):
                 unconnected_Nodes.append(node)
         return unconnected_Nodes
     
-    def plot3D(self, save_gif=False):
+    def plot3D(self, save_gif=False, num_steps=100):
 
         def walk(start_pos=(0, 0, 0), end_pos=(0, 0, 0), num_steps=100):
             steps = np.linspace(start_pos, end_pos, num_steps)
@@ -496,7 +496,6 @@ class Container_Struct(object):
 
         # Data: walks as arrays
         walks = list()
-        num_steps = 100
 
         for i, ld in enumerate(location_data):
             for ldc in location_data_connected[i]:

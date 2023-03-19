@@ -106,6 +106,7 @@ ax.set_zlabel('z')
 
 # Save figure
 plt.show()
+container.plot3D(save_gif=True, num_steps=50)
 # plt.savefig('3d_scatter.png', dpi=300)
 
 

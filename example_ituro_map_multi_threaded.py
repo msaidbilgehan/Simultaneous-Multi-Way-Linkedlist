@@ -120,6 +120,11 @@ output_Gate.set_Data("output_Gate")
 # counter_connections += output_Gate.connect_Node_BiDirection(
 #     input_Gate
 # )
+counter_connections += container.connect_Nodes_To_Node(
+    nodes_row_1,
+    output_Gate,
+    bi_direction = True
+)
 # print("get_Connection_Number", container.get_Connection_Number())
 
 print("Unconnected Nodes:")
@@ -127,11 +132,11 @@ for node in container.get_Unconnected_Nodes():
     if len(node.get_Connected_Node_List()) == 0:
         print("\t -> ID:", node.get_ID(), "=>", node.get_Data())
 
-# counter_connections += container.connect_Nodes_To_Node(
-#     nodes_row_1,
-#     output_Gate,
-#     bi_direction=True
-# )
+counter_connections += container.connect_Nodes_To_Node(
+    nodes_row_1,
+    output_Gate,
+    bi_direction=True
+)
 # counter_connections += output_Gate.connect_Node_BiDirection(
 #     nodes_row_2[0]
 # )

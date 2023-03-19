@@ -108,7 +108,7 @@ class Node_Struct(object):
             if data == self.__data:
                 return [True, self]
         return [False, self]
-    
+
     def set_Is_Data_Checked(self, bool, checker_node=None):
         self.__is_Data_Checked = bool
         self.checked_by = checker_node

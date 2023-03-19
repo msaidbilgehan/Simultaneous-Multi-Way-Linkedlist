@@ -30,8 +30,8 @@ for i in range(NODE_ROW_LENGTH):
             node_layer_list[i])
         x_tolerance = 10
         for ii, node in enumerate(node_layer_list[i]):
-            node.move(x=2 * ii, y=-10, z=0)
-    elif i == 9:
+            node.set_Coordinate(x=5 * (ii + 1), y=i, z=0)
+    elif i == 4:
         counter_connections += container.connect_Node_Layers(
             node_layer_list[i], node_layer_list[i-1]
         )
@@ -40,14 +40,14 @@ for i in range(NODE_ROW_LENGTH):
         )
         x_tolerance = 20
         for ii, node in enumerate(node_layer_list[i]):
-            node.move(x=5 * ii, y=-10, z=0)
+            node.set_Coordinate(x=5 * (ii + 1), y=4, z=1)
     else:
         counter_connections += container.connect_Node_Layers(
             node_layer_list[i], node_layer_list[i-1]
         )
         x_tolerance = 0
         for ii, node in enumerate(node_layer_list[i]):
-            node.move(x=7 * ii, y=-10, z=0)
+            node.set_Coordinate(x=5 * (ii + 1), y=i, z=0.5)
 
 print()
 print("=== Node Layers ===")
@@ -62,6 +62,8 @@ print()
 
 # https://medium.com/swlh/python-data-visualization-with-matplotlib-for-absolute-beginner-part-iii-three-dimensional-8284df93dfab
 node_list, input_gate, output_Gate = container.get_Struct()
+input_gate.set_Coordinate(x=-2, y=0, z=-1)
+output_Gate.set_Coordinate(x=10 , y=7, z=1)
 
 nodes_ID_information = [node.get_ID() for node in node_list]
 nodes_3D_information = [node.get_Information_3D() for node in node_list]

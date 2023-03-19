@@ -22,10 +22,10 @@ print("Max Workers:", container.get_Max_Workers())
 counter_connections = 0
 node_layer_list = container.create_Node(NODE_ROW_LENGTH, True)
 
-for i, node in enumerate(node_layer_list):
-    node.move(x=2 * i, y=-10, z=0)
 counter_connections = container.connect_Node_As_Ordered()
-
+for i, node in enumerate(node_layer_list):
+    node.set_Coordinate(x=2 * i, y=i**3, z=0)
+    
 print()
 print("=== Node Layers ===")
 print("Node Number:", container.get_Node_Number())

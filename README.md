@@ -43,6 +43,8 @@ The Simultaneous Multi-Way Linked-List data structure is implemented using a com
 
 In summary, the Simultaneous Multi-Way Linked-List is a powerful data structure that provides efficient storage and retrieval of multiple sequences of data, while allowing for concurrent access by multiple processes. Its hierarchical structure and efficient synchronization mechanism make it an ideal choice for complex applications that require the management of large amounts of data.
 
+![Animated Node and Connections](media/animation-min.gif)
+
 ## 🧐 What is Multi-Way Linked-List <a name = "what_is_multi-way_linked-list"></a>
 
 A multi-way linked list is a data structure similar to a traditional linked list, but where each node has multiple pointers to other nodes, rather than just one. In a multi-way linked list, each node can have any number of pointers to other nodes, rather than just a single next node pointer.

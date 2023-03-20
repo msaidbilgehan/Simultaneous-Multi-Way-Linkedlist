@@ -45,6 +45,7 @@ In summary, the Simultaneous Multi-Way Linked-List is a powerful data structure 
 
 ![Animated Node and Connections 1](media/animation-min-1.gif)
 ![Animated Node and Connections 2](media/animation-min-2.gif)
+![ITURO Map Implementation](media/ituromap_implementation.jpeg)
 
 ## 🧐 What is Multi-Way Linked-List <a name = "what_is_multi-way_linked-list"></a>
 

@@ -55,8 +55,6 @@ class Genetic_Environment():
               latest_gene = self.latest_Gene(chromosome)
             else:
               latest_gene = chromosome[-1]
-            if latest_gene is None:
-              pass
             gene = self.random_Gene_From_Parent(latest_gene)
           if gene not in chromosome:
             chromosome.append(gene)
@@ -165,6 +163,16 @@ class Genetic_Environment():
             else:
               child.append(parent2[i])
       return child
+      
+    def autorun(self):
+      self.create_Population(unique=True)
+      self.calculate_Fitness_For_Population()
+      generation_count = 0
+      while self.get_Best_Member_Fitness() < 10:
+        generation_count += self.crossover(
+            unique=True, best_percentage=0.1, evolve_probability=0.1)
+        self.calculate_Fitness_For_Population()
+      return self.get_Best_Member(), generation_count
       
 class Member():
   def __init__(self, chromosome):

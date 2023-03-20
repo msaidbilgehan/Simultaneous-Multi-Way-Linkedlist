@@ -180,12 +180,12 @@ class Container_Struct(object):
     def connect_Node_As_Ordered(self) -> int:
         counter_connections = 0
         if len(self.__node_List) > 2:
-            counter_connections += self.connect_to_Input_Gate(0)
+            counter_connections += self.connect_to_Input_Gate(2)
             counter_connections += self.connect_to_Output_Gate(
                 len(self.__node_List) - 1
             )
             # debug_node = None
-            for i in range(0, len(self.__node_List) - 1):
+            for i in range(2, len(self.__node_List) - 1):
                 # print(i, self.__node_List[i].get_ID())
                 self.__node_List[i].connect_To_Node(self.__node_List[i + 1])
                 counter_connections += 1
@@ -214,8 +214,17 @@ class Container_Struct(object):
     def get_Node_ID_Map(self):
         return self.__node_id_array_map
 
+    def get_Input_Gate(self) -> Node_Struct:
+        return self.input_Gate
+    
+    def get_Output_Gate(self) -> Node_Struct:
+        return self.output_Gate
+
+    def get_Node_List(self) -> list:
+        return self.__node_List
+
     def get_Struct(self) -> tuple:
-        return self.__node_List, self.input_Gate, self.output_Gate
+        return self.get_Node_List(), self.get_Input_Gate(), self.get_Output_Gate()
 
     def get_Node_Number(self) -> int:
         return len(self.__node_List)

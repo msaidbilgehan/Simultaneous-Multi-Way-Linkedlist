@@ -34,8 +34,7 @@ class Genetic_Environment():
       connected_genes = parent_gene.get_Connected_Node_List()
       if len(connected_genes) > 0:
         return random.choice(connected_genes)
-      else:
-        return None
+      return None
     
     @staticmethod
     def latest_Gene(chromosome):
@@ -152,9 +151,47 @@ class Genetic_Environment():
             else:
               child.append(self.random_Gene())
           elif e_probability < evolve_probability * 2:
-            child.append(parent1[i])
+            count_repeat = 0
+            while unique and count_repeat < 3:
+              if parent1[i] is None:
+                child.append(None)
+                break
+              elif parent1[i] not in child:
+                child.append(None)
+                break
+              else:
+                gene = self.random_Gene_From_Parent(parent1[i])
+                if gene is None:
+                  child.append(gene)
+                  break
+                elif gene not in child:
+                  child.append(gene)
+                  break
+                else:
+                  count_repeat += 1
+            if not unique:
+              child.append(parent1[i])
           else:
-            child.append(parent2[i])
+            count_repeat = 0
+            while unique and count_repeat < 3:
+              if parent2[i] is None:
+                child.append(None)
+                break
+              elif parent2[i] not in child:
+                child.append(None)
+                break
+              else:
+                gene = self.random_Gene_From_Parent(parent2[i])
+                if gene is None:
+                  child.append(gene)
+                  break
+                elif gene not in child:
+                  child.append(gene)
+                  break
+                else:
+                  count_repeat += 1
+            if not unique:
+              child.append(parent2[i])
         else:
           # Crossover
           for i in range(len(parent1)):
@@ -167,12 +204,14 @@ class Genetic_Environment():
     def autorun(self):
       self.create_Population(unique=True)
       self.calculate_Fitness_For_Population()
-      generation_count = 0
       while self.get_Best_Member_Fitness() < 10:
-        generation_count += self.crossover(
-            unique=True, best_percentage=0.1, evolve_probability=0.1)
+        self.crossover(
+            unique=True, 
+            best_percentage=0.1, 
+            evolve_probability=0.1
+        )
         self.calculate_Fitness_For_Population()
-      return self.get_Best_Member(), generation_count
+      return self.get_Best_Member(), self.generation_count
       
 class Member():
   def __init__(self, chromosome):

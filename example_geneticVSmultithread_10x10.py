@@ -3,7 +3,7 @@ from Classes.Container import Container_Struct
 from Classes.Genetic import Genetic_Environment
 
 NODE_ROW_LENGTH = 100
-NODE_COLUMN_LENGTH = 50
+NODE_COLUMN_LENGTH = 10
 
 # Create a container
 container = Container_Struct()
@@ -45,7 +45,7 @@ print()
 print("=== Genetic Algorithm ===")
 genetic_env = Genetic_Environment(
     target=target,
-    population_number=1000,
+    population_number=100,
     gene_pool=gene_pool,
     input_gene=container.get_Input_Gate()
 )

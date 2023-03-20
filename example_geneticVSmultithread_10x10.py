@@ -2,7 +2,7 @@ from time import time
 from Classes.Container import Container_Struct
 from Classes.Genetic import Genetic_Environment
 
-NODE_ROW_LENGTH = 100
+NODE_ROW_LENGTH = 50
 NODE_COLUMN_LENGTH = 10
 
 # Create a container
@@ -67,6 +67,7 @@ path = [
     gene.get_ID() for gene in best_member.get_Chromosome()
     if gene is not None
 ]
+path.sort(reverse=True)
 
 print("Generation Count:", generation_count)
 print(f"Best Fitness ({best_member.get_Fitness()}) Member:", path)

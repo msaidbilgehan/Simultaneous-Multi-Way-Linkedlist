@@ -48,7 +48,7 @@ class Genetic_Environment():
         chromosome = list()
         for _ in range(len(self.gene_pool)):
           if len(chromosome) == 0:
-            gene = self.random_Gene_From_Parent(self.input_gene)
+            gene = self.input_gene
           else:
             if None in chromosome:
               latest_gene = self.latest_Gene(chromosome)
@@ -71,6 +71,12 @@ class Genetic_Environment():
           Member(self.create_Chromosome(unique))
           for _ in range(self.population_number)
         ]
+      
+      # TODO: Remove this! Sometimes chromosome length is less than gene pool length
+      for member in self.population:
+        if len(member.get_Chromosome()) < len(self.gene_pool):
+          print("!!!!!!! --- Chromosome Length: ", len(member.get_Chromosome()))
+      pass
       
     def get_Population(self) -> list:
       return self.population
@@ -116,6 +122,9 @@ class Genetic_Environment():
       while self.next_generation.__len__() < self.population_number:
         parent1 = random.choice(best_members)
         parent2 = random.choice(best_members)
+        while len(parent1.get_Chromosome()) != len(parent2.get_Chromosome()):
+          parent1 = random.choice(best_members)
+          parent2 = random.choice(best_members)
         
         # Crossover
         child = self.__crossover(

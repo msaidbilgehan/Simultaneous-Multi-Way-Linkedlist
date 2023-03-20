@@ -107,7 +107,11 @@ Add notes about how to use the system.
 
 "Container" class contains useful features as creating nodes, connecting nodes, two different search algorithms, and so on...
 
-"Node" class is a node for storing data or running some task simultaneously wih other nodes. 
+"Container_Numpy" class inherits "Container" class and has node ID indexing feature using numpy.
+
+"Node" class is a node for storing data or running some task simultaneously wih other nodes.
+
+"Node_PC" class is a inherits "Node" class and has point cloud features such as x, y, z coordinates, some coordinate actions such as set coordinate, move, connected node coordinates, and so on. To see point cloud, you can use 3D Plot (plot3d) method of container. Before using 3D Plot feature, don't forget to use is_point_cloud flag as True while implementing container.
 
 "Gate" class contains input gate node and output gate node for creating an input and output connections to other nodes
 

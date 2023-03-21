@@ -45,14 +45,14 @@ print()
 print("=== Genetic Algorithm ===")
 genetic_env = Genetic_Environment(
     target=target,
-    population_number=500,
+    population_number=100,
     gene_pool=gene_pool,
     input_gene=container.get_Input_Gate()
 )
 # print("Example Chromosome:", genetic_env.create_Chromosome())
 
-genetic_env.create_Population(unique=True)
-genetic_env.calculate_Fitness_For_Population()
+# genetic_env.create_Population(unique=True)
+# genetic_env.calculate_Fitness_For_Population()
 # population = genetic_env.get_Population()
 # population_fitnesses = [member.get_Fitness() for member in population]
 # print("Fitness Values of Population:", population_fitnesses)
@@ -62,9 +62,10 @@ genetic_env.calculate_Fitness_For_Population()
 start_time = time()
 # generation_count = genetic_env.crossover()
 best_member, generation_count = genetic_env.autorun(
+    minimum_fitness=int(len(gene_pool) * 0.9), 
     unique=True, 
     best_percentage=0.1, 
-    evolve_probability=0.5,
+    evolve_probability=0.5, 
     verbose=True
 )
 end_time = time()

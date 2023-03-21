@@ -100,7 +100,7 @@ class Genetic_Environment():
       for i, gene in enumerate(member.get_Chromosome()):
         # fitness += 10 if gene == self.target else -1
         if gene == self.target:
-          fitness += 10 * (len(self.gene_pool) - i)
+          fitness += (len(self.gene_pool) - i)
           break
         else:
           fitness -= 1
@@ -231,7 +231,9 @@ class Genetic_Environment():
               child.append(parent2[i])
       return child
       
-    def autorun(self, unique: bool = True, best_percentage: float = 0.1, evolve_probability: float=0.1, verbose: bool = False):
+    def autorun(self, minimum_fitness: int = 10, unique: bool = True, best_percentage: float = 0.1, evolve_probability: float = 0.1, verbose: bool = False):
+      if verbose:
+        print(f"Parameters:\n\t-> Minimum Fitness: {minimum_fitness}\n\t-> Unique: {unique}\n\t-> Best Percentage: {best_percentage}\n\t-> Evolve Probability: {evolve_probability}\n\t-> Verbose: {verbose}")
       self.create_Population(unique=True)
       if verbose:
         print("Population Created.")
@@ -239,7 +241,7 @@ class Genetic_Environment():
       if verbose:
         print("Fitness Calculated.")
       i = 0
-      while self.get_Best_Member_Fitness() < 10:
+      while self.get_Best_Member_Fitness() < minimum_fitness:
         self.crossover(
             unique=unique,
             best_percentage=best_percentage, 

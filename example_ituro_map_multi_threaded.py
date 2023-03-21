@@ -178,15 +178,15 @@ print("Connections:", counter_connections)
 
 print()
 
-nodes_row_1[0].set_Data(SEARCHED_DATA)
-nodes_row_1[1].set_Data(SEARCHED_DATA)
+# nodes_row_1[0].set_Data(SEARCHED_DATA)
+# nodes_row_1[1].set_Data(SEARCHED_DATA)
 nodes_row_2[0].set_Data(SEARCHED_DATA)
-nodes_row_3[0].set_Data(SEARCHED_DATA)
+# nodes_row_3[0].set_Data(SEARCHED_DATA)
 nodes_row_4[1].set_Data(SEARCHED_DATA)
-nodes_x[0].set_Data(SEARCHED_DATA)
-nodes_y[2].set_Data(SEARCHED_DATA)
-nodes_z[1].set_Data(SEARCHED_DATA)
-nodes_t[1].set_Data(SEARCHED_DATA)
+# nodes_x[0].set_Data(SEARCHED_DATA)
+# nodes_y[2].set_Data(SEARCHED_DATA)
+# nodes_z[1].set_Data(SEARCHED_DATA)
+# nodes_t[1].set_Data(SEARCHED_DATA)
 print(
     f"nodes_row_1[0] (id is {nodes_row_1[0].get_ID()}) contains {nodes_row_1[0].get_Data()}"
 )
@@ -230,6 +230,7 @@ for found_node in found_node_list:
     )
     path_checker_result = path_checker_result[:-1]
     path_checker_result = path_checker_result[::-1]
+
     print("")
     print("Find Path by Checker Result:")
     for step in path_checker_result:

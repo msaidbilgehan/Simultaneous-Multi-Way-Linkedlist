@@ -96,6 +96,7 @@ path_checker_result = container.find_Path_By_Checker_Node(
 )
 path_checker_result = path_checker_result[:-1]
 path_checker_result = path_checker_result[::-1]
+
 print("")
 print("Find Path by Checker Result:")
 for step in path_checker_result:

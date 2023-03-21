@@ -22,15 +22,24 @@ class Genetic_Environment():
       self.population_history = list()
       
     def reset_Genetic(self):
+      """
+      Resets the genetic algorithm.
+      """
       self.population = list()
       self.next_generation = list()
       self.generation_count = 0
       self.population_history = list()
       
     def random_Gene(self):
+      """
+      Returns a random gene from the gene pool.
+      """
       return random.choice(self.gene_pool)
       
     def random_Gene_From_Parent(self, parent_gene):
+      """
+      Returns a random gene from the parent gene's connected node list.
+      """
       connected_genes = parent_gene.get_Connected_Node_List()
       if len(connected_genes) > 0:
         return random.choice(connected_genes)
@@ -38,9 +47,15 @@ class Genetic_Environment():
     
     @staticmethod
     def latest_Gene(chromosome):
+      """
+      Returns the latest gene in a chromosome.
+      """
+      # Iterate over the chromosome backwards
       for i in range(len(chromosome) - 1, -1, -1):
-        if chromosome[i] is not None:
-            return chromosome[i]
+          # If a gene is found, return it
+          if chromosome[i] is not None:
+              return chromosome[i]
+      # If no gene is found, return None
       return None
     
     def create_Chromosome(self, unique:bool) -> list:
@@ -75,30 +90,33 @@ class Genetic_Environment():
       # TODO: Remove this! Sometimes chromosome length is less than gene pool length
       for member in self.population:
         if len(member.get_Chromosome()) < len(self.gene_pool):
-          print("!!!!!!! --- Chromosome Length: ", len(member.get_Chromosome()))
-      pass
+          raise ValueError(f"Chromosome length is less than gene pool length ({len(member.get_Chromosome())} < {len(self.gene_pool)})")
       
     def get_Population(self) -> list:
       return self.population
       
     def calculate_Fitness(self, member):
       fitness = 0
-      for gene in member.get_Chromosome():
+      for i, gene in enumerate(member.get_Chromosome()):
+        # fitness += 10 if gene == self.target else -1
         if gene == self.target:
-          fitness += 10
+          fitness += 10 * (len(self.gene_pool) - i)
           break
         else:
           fitness -= 1
       member.fitness = fitness
-      
+    
     def calculate_Fitness_For_Population(self):
-      for member in self.population:
-        self.calculate_Fitness(member)
-        
+        # Calculate the fitness for each member in the population
+        for member in self.population:
+            self.calculate_Fitness(member)
+
     def get_Best_Member(self):
-      return max(self.population, key=lambda member: member.get_Fitness())
+        # Return the member with the highest fitness
+        return max(self.population, key=lambda member: member.get_Fitness())
     
     def sort_Population(self):
+      # Sort the population by fitness (descending order)
       self.population.sort(key=lambda member: member.get_Fitness(), reverse=True)
     
     def get_Best_Member_Fitness(self) -> int:
@@ -142,6 +160,9 @@ class Genetic_Environment():
       return self.generation_count
       
     def __crossover(self, parent1, parent2, unique:bool, evolve:bool, evolve_probability:float):
+      if len(parent1) != len(parent2):
+        raise ValueError("Parents have different chromosome lengths.")
+      
       child = list()
       
       # Evolve or Crossover
@@ -210,16 +231,26 @@ class Genetic_Environment():
               child.append(parent2[i])
       return child
       
-    def autorun(self):
+    def autorun(self, unique: bool = True, best_percentage: float = 0.1, evolve_probability: float=0.1, verbose: bool = False):
       self.create_Population(unique=True)
+      if verbose:
+        print("Population Created.")
       self.calculate_Fitness_For_Population()
+      if verbose:
+        print("Fitness Calculated.")
+      i = 0
       while self.get_Best_Member_Fitness() < 10:
         self.crossover(
-            unique=True, 
-            best_percentage=0.1, 
-            evolve_probability=0.1
+            unique=unique,
+            best_percentage=best_percentage, 
+            evolve_probability=evolve_probability
         )
         self.calculate_Fitness_For_Population()
+        if verbose:
+          print(f"{i}. Crossover Best Fitness is {self.get_Best_Member_Fitness()}", end="\r")
+        i += 1
+      if verbose:
+        print()
       return self.get_Best_Member(), self.generation_count
       
 class Member():

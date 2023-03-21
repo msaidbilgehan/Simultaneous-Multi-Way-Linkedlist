@@ -3,10 +3,10 @@ from Classes.Container import Container_Struct
 from Classes.Genetic import Genetic_Environment
 
 NODE_ROW_LENGTH = 50
-NODE_COLUMN_LENGTH = 10
+NODE_COLUMN_LENGTH = 50
 
 # Create a container
-container = Container_Struct()
+container = Container_Struct(verbose=True)
 
 print()
 print("=== Create Nodes ===")
@@ -35,7 +35,7 @@ for i in range(NODE_ROW_LENGTH):
 gene_pool = container.get_Node_List()
 
 # Select Target Node
-target = gene_pool[-5]
+target = gene_pool[-2]
 target.set_Data("Target Node")
 
 print("Target: ", target.get_ID())
@@ -45,7 +45,7 @@ print()
 print("=== Genetic Algorithm ===")
 genetic_env = Genetic_Environment(
     target=target,
-    population_number=100,
+    population_number=500,
     gene_pool=gene_pool,
     input_gene=container.get_Input_Gate()
 )
@@ -61,7 +61,12 @@ genetic_env.calculate_Fitness_For_Population()
 # print(f"Best Fitness ({max(population_fitnesses)}) Path:", best_path)
 start_time = time()
 # generation_count = genetic_env.crossover()
-best_member, generation_count = genetic_env.autorun()
+best_member, generation_count = genetic_env.autorun(
+    unique=True, 
+    best_percentage=0.1, 
+    evolve_probability=0.5,
+    verbose=True
+)
 end_time = time()
 path = [
     gene.get_ID() for gene in best_member.get_Chromosome()

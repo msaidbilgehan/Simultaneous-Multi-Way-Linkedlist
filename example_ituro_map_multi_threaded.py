@@ -230,7 +230,10 @@ for found_node in found_node_list:
     )
     path_checker_result = path_checker_result[:-1]
     path_checker_result = path_checker_result[::-1]
-
+    container.optimize_Path(
+        path=path_checker_result, 
+        target=found_node
+    )
     print("")
     print("Find Path by Checker Result:")
     for step in path_checker_result:

@@ -151,7 +151,7 @@ output_Gate.set_Coordinate(x=-10, y=10, z=0)
 gene_pool = container.get_Node_List()
 
 # Select Target Node
-target = nodes_x[-1]  # gene_pool[-2]
+target = nodes_row_4[-2]  # gene_pool[-2] nodes_x[-1] nodes_row_1[-2]
 target.set_Color(COLORS.YELLOW)
 target.set_Marker(MARKERS.DIAMOND)
 target.set_Data("Target Node")
@@ -221,6 +221,17 @@ path_checker_result = container.find_Path_By_Checker_Node(
 )
 path_checker_result = path_checker_result[:-1]
 path_checker_result = path_checker_result[::-1]
+
+for step_node in path_checker_result:
+    step_node.set_Color(COLORS.GREEN)
+
+path_checker_result = container.optimize_Path(
+    path=path_checker_result,
+    target=found_node_list[0]
+)
+for step_node in path_checker_result:
+    step_node.set_Marker(MARKERS.SQUARE)
+
 print("Find Path by Checker Result:")
 for step in path_checker_result:
     print(step.get_ID(), end=" > ")

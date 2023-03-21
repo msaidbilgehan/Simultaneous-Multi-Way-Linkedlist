@@ -577,7 +577,44 @@ class Container_Struct(object):
         if save_gif:
             writer_gif = animation.PillowWriter(fps=30)
             anim.save(r"animation.gif", writer=writer_gif)
-    
+
+    @staticmethod
+    def optimize_Path(path: list, target: Node_Point_Cloud_Struct or Node_Struct) -> list:
+        # print(f"Before Path ({len(path)}):", [node.get_ID() for node in path])
+
+        original_path = path.copy()
+        while True:
+            last_match = None
+            removed_counter = 0
+            path_start_length = len(path)
+            for i, node in enumerate(path):
+                connected_nodes = node.get_Connected_Node_List()
+
+                if last_match is not None:
+                    path[i] = last_match
+                    removed_counter = path_start_length - i
+                    if last_match == target:
+                        while removed_counter:
+                            path.pop()
+                            removed_counter -= 1
+                        break
+
+                last_match = None
+
+                for local_node in path[i:]:
+                    if local_node in connected_nodes:
+                        last_match = local_node
+            if original_path == path:
+                break
+            original_path = path.copy()
+            path.append(target)
+
+        path.append(target)
+        # sorted(set(path), key=lambda node: node.get_ID())
+        sorted(path, key=lambda node: node.get_ID())
+        # print(f"After Path ({len(path)}):", [node.get_ID() for node in path])
+        return path
+
     @staticmethod
     def set_Recursion_Limit(value:int=10000):
         sys.setrecursionlimit(value)
@@ -612,5 +649,6 @@ class Container_Struct(object):
             else:
                 path.append(current_Node)
                 break
+            
         return path
 

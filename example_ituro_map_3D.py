@@ -1,16 +1,9 @@
-from random import randint, seed
 from time import time
 from Classes.Container import Container_Struct
 
 print("")
 print("=== Initialize ===")
 NUMBER_OF_MAX_WORKERS = 10000
-
-seed(time())
-SEARCHED_DATA = -13  # randint(0, 100)
-NODE_COLUMN_LENGTH = 4  # randint(0, 10000) or cpu_count() * 100
-NODE_ROW_LENGTH = 4  # randint(0, 10000) or cpu_count() * 100
-SEARCHED_NODE_INDEX = NODE_COLUMN_LENGTH - randint(1, NODE_COLUMN_LENGTH-1)
 
 # Create a container
 container = Container_Struct(
@@ -22,7 +15,7 @@ container = Container_Struct(
 
 print("Max Workers:", container.get_Max_Workers())
 
-# Create NODE_COLUMN_LENGTH x NODE_ROW_LENGTH node layers
+# Create node layers
 node_layer_list = list()
 counter_connections = 0
 

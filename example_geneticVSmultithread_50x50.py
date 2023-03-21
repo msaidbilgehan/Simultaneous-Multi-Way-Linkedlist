@@ -33,7 +33,7 @@ for i in range(NODE_ROW_LENGTH):
 
 # Get gene pool
 gene_pool = container.get_Node_List()
-
+print("Gene Pool Number: ", len(gene_pool))
 # Select Target Node
 target = gene_pool[-2]
 target.set_Data("Target Node")
@@ -65,7 +65,7 @@ best_member, generation_count = genetic_env.autorun(
     minimum_fitness=int(len(gene_pool) * 0.9), 
     unique=True, 
     best_percentage=0.1, 
-    evolve_probability=0.5, 
+    evolve_probability=0.6, 
     verbose=True
 )
 end_time = time()

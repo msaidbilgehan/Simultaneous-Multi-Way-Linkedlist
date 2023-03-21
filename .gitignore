@@ -1,8 +1,8 @@
 /.vscode
 /venv
 **__pycache__**
-Classes/__pycache__/**
-Classes/__pycache__/Node.cpython-311.pyc
+Classes/__pycache__/
+atistech/
 node_ID_Map.json
 animation.gif
 test.py

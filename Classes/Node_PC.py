@@ -2,19 +2,31 @@
 
 # CLASSES
 
-from concurrent.futures import ThreadPoolExecutor
-from threading import Lock, Thread
+from threading import Thread
 from Classes.Node import Node_Struct
 from enum import Enum
-# from multiprocessing import cpu_count
 
 class COLORS(Enum):
-    BLACK = -1
-    WHITE = 0
-    RED = 1
-    GREEN = 2
-    BLUE = 3
-    YELLOW = 4
+    BLACK = "b"
+    WHITE = "w"
+    RED = "r"
+    GREEN = "g"
+    BLUE = "b"
+    YELLOW = "y"
+    
+class MARKERS(Enum):
+    X = "x"
+    CIRCLE = "o"
+    POINT = "."
+    TRIANGLE_DOWN = "v"
+    TRIANGLE_UP = "^"
+    SQUARE = "s"
+    PENTAGON = "p"
+    PLUS_FILLED = "P"
+    STAR = "*"
+    DIAMOND = "D"
+    THIN_DIAMOND = "d"
+    
 
 class Node_Point_Cloud_Struct(Node_Struct):
     def __init__(self, data=None, connections=None, is_Node_Blocked=False):
@@ -28,6 +40,8 @@ class Node_Point_Cloud_Struct(Node_Struct):
         self.coordinate_z = 0
         
         self.color = COLORS.BLUE
+        self.marker = MARKERS.CIRCLE
+        self.size = 50
         
         self.__move_Task_Thread = None
 
@@ -37,6 +51,18 @@ class Node_Point_Cloud_Struct(Node_Struct):
 
     def get_Color(self) -> COLORS:
         return self.color
+
+    def set_Marker(self, marker:MARKERS):
+        self.marker = marker
+
+    def get_Marker(self) -> MARKERS:
+        return self.marker
+
+    def set_Size(self, size:int):
+        self.size = size
+
+    def get_Size(self) -> int:
+        return self.size
 
     def set_Coordinate(self, x:int, y:int, z:int) -> int:
         self.coordinate_x = x
@@ -89,6 +115,8 @@ class Node_Point_Cloud_Struct(Node_Struct):
         return {
             "coordinates": self.get_Coordinate(),
             "color": self.get_Color(),
+            "marker": self.get_Marker(),
+            "size": self.get_Size(),
             "connected_coordinates": [node.get_Coordinate() for node in self.get_Connected_Node_List()]
         }
 

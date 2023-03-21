@@ -490,27 +490,30 @@ class Container_Struct(object):
 
         nodes_ID_information = [node.get_ID() for node in self.__node_List]
         nodes_3D_information = [node.get_Information_3D() for node in self.__node_List]
-        location_data = [
-            node_3D["coordinates"]
+        location_color_marker_data = [
+            (node_3D["coordinates"], node_3D["color"], node_3D["marker"])
             for node_3D in nodes_3D_information
         ]
+        
         location_data_connected = [
             node_3D["connected_coordinates"]
             for node_3D in nodes_3D_information
         ]
 
-        xdata = [ld[0] for ld in location_data]
-        ydata = [ld[1] for ld in location_data]
-        zdata = [ld[2] for ld in location_data]
+        xdata = [ld[0][0] for ld in location_color_marker_data]
+        ydata = [ld[0][1] for ld in location_color_marker_data]
+        zdata = [ld[0][2] for ld in location_color_marker_data]
+        color_data = [ld[1] for ld in location_color_marker_data]
+        marker_data = [ld[2] for ld in location_color_marker_data]
 
         # Data: walks as arrays
         walks = list()
 
-        for i, ld in enumerate(location_data):
+        for i, ld in enumerate(location_color_marker_data):
             for ldc in location_data_connected[i]:
                 walks.append(
                     walk(
-                        start_pos=ld,
+                        start_pos=ld[0],
                         end_pos=ldc,
                         num_steps=num_steps
                     )
@@ -539,7 +542,15 @@ class Container_Struct(object):
         )
 
         # Visualize 3D scatter plot
-        ax.scatter3D(xdata, ydata, zdata, c=zdata, cmap='jet', s=70)
+        # ax.scatter3D(xdata, ydata, zdata, c=zdata, cmap='jet', s=50)
+        # ax.scatter3D(X[Z <= 5], Y[Z <= 5], Z[Z <= 5], s=70, c='g', marker='x')
+        for i, ld in enumerate(location_color_marker_data):
+            ax.scatter3D(
+                xdata[i], ydata[i], zdata[i],
+                c=color_data[i].value,
+                marker=marker_data[i].value,
+                s=50
+            )
         ax.view_init(elev=25, azim=-30)
         ax.autoscale(enable=True, axis='both', tight=None)
 

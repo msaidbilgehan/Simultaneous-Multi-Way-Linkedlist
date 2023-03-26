@@ -10,7 +10,7 @@ import numpy as np
 
 from Classes.Gate import Gate_Struct, Gate_Point_Cloud_Struct
 from Classes.Node import Node_Struct
-from Classes.Node_PC import Node_Point_Cloud_Struct
+from Classes.Node_PC import Node_Point_Cloud_Struct, MARKERS, COLORS
 from Classes.Search_History import Search_History_List_Struct
 
 
@@ -25,7 +25,11 @@ class Container_Struct(object):
 
         if is_point_cloud:
             self.input_Gate = Gate_Point_Cloud_Struct()
+            self.input_Gate.set_Marker(MARKERS.TRIANGLE_UP)
+            self.input_Gate.set_Color(COLORS.GREEN)
             self.output_Gate = Gate_Point_Cloud_Struct()
+            self.output_Gate.set_Marker(MARKERS.TRIANGLE_DOWN)
+            self.output_Gate.set_Color(COLORS.RED)
         else:
             self.input_Gate = Gate_Struct()
             self.output_Gate = Gate_Struct()
@@ -92,11 +96,11 @@ class Container_Struct(object):
         self.input_Gate.connect_To_Node(self.__node_List[index])
         return 1
     
-    def connect_to_Output_Gate(self, index, is_point_cloud=False) -> int:
+    def connect_to_Output_Gate(self, index) -> int:
         self.__node_List[index].connect_To_Node(self.output_Gate)
         return 1
 
-    def connect_Node_Layers(self, node_layer_1, node_layer_2, is_point_cloud=False) -> int:
+    def connect_Node_Layers(self, node_layer_1, node_layer_2) -> int:
         counter_connections = 0
         for layer_1_node in node_layer_1:
             for layer_2_node in node_layer_2:
@@ -214,10 +218,10 @@ class Container_Struct(object):
     def get_Node_ID_Map(self):
         return self.__node_id_array_map
 
-    def get_Input_Gate(self) -> Node_Struct:
+    def get_Input_Gate(self) -> Gate_Struct or Gate_Point_Cloud_Struct:
         return self.input_Gate
     
-    def get_Output_Gate(self) -> Node_Struct:
+    def get_Output_Gate(self) -> Gate_Struct or Gate_Point_Cloud_Struct:
         return self.output_Gate
 
     def get_Node_List(self) -> list:
@@ -470,7 +474,14 @@ class Container_Struct(object):
                 unconnected_Nodes.append(node)
         return unconnected_Nodes
     
-    def plot3D(self, save_gif=False, num_steps=100):
+    def set_Coordinate_Bulk(self, node_list:list, start_x:int=0, start_y:int=0, start_z:int=0, x_step:int=1, y_step:int=1, z_step:int=1):
+        for node in node_list:
+            node.set_Coordinate(start_x, start_y, start_z)
+            start_x += x_step
+            start_y += y_step
+            start_z += z_step
+    
+    def plot3D(self, draw_connections=True, draw_labels=True, save_gif=False, num_steps=100):
 
         def walk(start_pos=(0, 0, 0), end_pos=(0, 0, 0), num_steps=100):
             steps = np.linspace(start_pos, end_pos, num_steps)
@@ -532,30 +543,33 @@ class Container_Struct(object):
         ax.set(zlim3d=(0, 1), zlabel='Z')
 
         # Creating the Animation object
-        anim = animation.FuncAnimation(
-            fig,
-            update_lines,
-            num_steps,
-            fargs=(walks, lines),
-            interval=100,
-            repeat=False
-        )
+        if draw_connections:
+            anim = animation.FuncAnimation(
+                fig,
+                update_lines,
+                num_steps,
+                fargs=(walks, lines),
+                interval=100,
+                repeat=False
+            )
 
         # Visualize 3D scatter plot
         # ax.scatter3D(xdata, ydata, zdata, c=zdata, cmap='jet', s=50)
         # ax.scatter3D(X[Z <= 5], Y[Z <= 5], Z[Z <= 5], s=70, c='g', marker='x')
         for i, ld in enumerate(location_color_marker_data):
-            ax.scatter3D(
+            ax.scatter3D(  # type: ignore
                 xdata[i], ydata[i], zdata[i],
                 c=color_data[i].value,
                 marker=marker_data[i].value,
                 s=50
             )
-        ax.view_init(elev=25, azim=-30)
+        ax.view_init(elev=25, azim=-30)  # type: ignore
         ax.autoscale(enable=True, axis='both', tight=None)
 
-        for i, id in enumerate(nodes_ID_information):
-            ax.text(xdata[i], ydata[i], zdata[i], id, color='red')
+        # Visualize labels
+        if draw_labels:
+            for i, id in enumerate(nodes_ID_information):
+                ax.text(xdata[i], ydata[i], zdata[i], id, color='red')
 
         # Visualize Connections
         # for i, ld_connected_nodes in enumerate(location_data_connected):
@@ -568,15 +582,17 @@ class Container_Struct(object):
         # Give labels
         ax.set_xlabel('x')
         ax.set_ylabel('y')
-        ax.set_zlabel('z')
+        ax.set_zlabel('z')  # type: ignore
 
         # Save figure
         plt.show()
         # plt.savefig('3d_scatter.png', dpi=300)
         
-        if save_gif:
+        if save_gif and draw_connections:
             writer_gif = animation.PillowWriter(fps=30)
-            anim.save(r"animation.gif", writer=writer_gif)
+            anim.save(r"animation.gif", writer=writer_gif) # type: ignore
+        else:
+            plt.savefig('3D_Node_Map.png')
 
     @staticmethod
     def optimize_Path(path: list, target: Node_Point_Cloud_Struct or Node_Struct) -> list:

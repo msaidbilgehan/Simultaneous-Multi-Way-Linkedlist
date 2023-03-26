@@ -8,8 +8,8 @@ NUMBER_OF_MAX_WORKERS = 10000
 
 seed(time())
 SEARCHED_DATA = -13  # randint(0, 100)
-NODE_COLUMN_LENGTH = 10  # randint(0, 10000) or cpu_count() * 100
-NODE_ROW_LENGTH = 1000  # randint(0, 10000) or cpu_count() * 100
+NODE_COLUMN_LENGTH = 7  # randint(0, 10000) or cpu_count() * 100
+NODE_ROW_LENGTH = 2000  # randint(0, 10000) or cpu_count() * 100
 SEARCHED_NODE_INDEX = NODE_COLUMN_LENGTH - randint(1, NODE_COLUMN_LENGTH-1)
 
 # Create a container
@@ -98,6 +98,10 @@ path_checker_result = container.find_Path_By_Checker_Node(
 )
 path_checker_result = path_checker_result[:-1]
 path_checker_result = path_checker_result[::-1]
+path_checker_result = container.optimize_Path(
+    path=path_checker_result,
+    target=found_node_list[0]
+)
 print("")
 print("Find Path by Checker Result:")
 for step in path_checker_result:

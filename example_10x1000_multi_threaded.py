@@ -8,12 +8,12 @@ NUMBER_OF_MAX_WORKERS = 10000
 
 seed(time())
 SEARCHED_DATA = -13  # randint(0, 100)
-NODE_COLUMN_LENGTH = 7  # randint(0, 10000) or cpu_count() * 100
-NODE_ROW_LENGTH = 2000  # randint(0, 10000) or cpu_count() * 100
+NODE_COLUMN_LENGTH = 10  # randint(0, 10000) or cpu_count() * 100
+NODE_ROW_LENGTH = 10  # randint(0, 10000) or cpu_count() * 100
 SEARCHED_NODE_INDEX = NODE_COLUMN_LENGTH - randint(1, NODE_COLUMN_LENGTH-1)
 
 # Create a container
-container = Container_Struct(NUMBER_OF_MAX_WORKERS)
+container = Container_Struct(NUMBER_OF_MAX_WORKERS, is_point_cloud=True, verbose=False)
 # container.set_Max_Workers(NUMBER_OF_MAX_WORKERS)
 
 print("Max Workers:", container.get_Max_Workers())
@@ -21,12 +21,15 @@ print("Max Workers:", container.get_Max_Workers())
 # Create NODE_COLUMN_LENGTH x NODE_ROW_LENGTH node layers
 node_layer_list = list()
 counter_connections = 0
+y_step = 200
+start_x_tolerance = 100
+start_z_tolerance = 10
 for i in range(NODE_ROW_LENGTH):
-    node_layer_list.append(container.create_Node(NODE_COLUMN_LENGTH))
+    node_layer_list.append(container.create_Node(NODE_COLUMN_LENGTH, is_point_cloud=True))
     if i == 0:
         counter_connections += container.connect_Input_Gate_to_Node_Layer(
             node_layer_list[i])
-    elif i == 9:
+    elif i == NODE_ROW_LENGTH - 1:
         counter_connections += container.connect_Node_Layers(
             node_layer_list[i-1], node_layer_list[i]
         )
@@ -37,6 +40,26 @@ for i in range(NODE_ROW_LENGTH):
         counter_connections += container.connect_Node_Layers(
             node_layer_list[i-1], node_layer_list[i]
         )
+    container.set_Coordinate_Bulk(
+        node_list=node_layer_list[i],
+        start_x=i*(start_x_tolerance),
+        start_y=0,
+        start_z=i*start_x_tolerance,
+        x_step=0,
+        y_step=y_step,
+        z_step=0
+    )
+
+    container.get_Input_Gate().set_Coordinate(
+        x=-50,
+        y=i * start_x_tolerance,
+        z=-10
+    )
+    container.get_Output_Gate().set_Coordinate(
+        x=i*start_x_tolerance,
+        y=i * start_x_tolerance,
+        z=i*(start_x_tolerance + 10)
+    )
 
 print()
 print("=== Node Layers ===")
@@ -78,6 +101,10 @@ print(
 #     else:
 #         print("None", end="-")
 
+# print("Plotting 3D Graph...")
+# container.plot3D(draw_connections=True, draw_labels=False)
+# exit()
+
 print("\n")
 print("===== Multi-Threaded Search =====")
 
@@ -98,12 +125,13 @@ path_checker_result = container.find_Path_By_Checker_Node(
 )
 path_checker_result = path_checker_result[:-1]
 path_checker_result = path_checker_result[::-1]
+print(f"Find Path by Checker Result ({len(path_checker_result)})")
 path_checker_result = container.optimize_Path(
     path=path_checker_result,
     target=found_node_list[0]
 )
 print("")
-print("Find Path by Checker Result:")
+print(f"Find Path by Checker Optimized Result ({len(path_checker_result)}):")
 for step in path_checker_result:
     print(step.get_ID(), end=" > ")
 

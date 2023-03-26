@@ -240,13 +240,25 @@ class Genetic_Environment():
       self.calculate_Fitness_For_Population()
       if verbose:
         print("Fitness Calculated.")
+        
       i = 0
+      # fitness_history = dict()
       while self.get_Best_Member_Fitness() < minimum_fitness:
         self.crossover(
             unique=unique,
             best_percentage=best_percentage, 
             evolve_probability=evolve_probability
         )
+
+        # if self.get_Best_Member_Fitness() in fitness_history:
+        #   fitness_history[self.get_Best_Member_Fitness()] += 1
+        # else:
+        #   fitness_history[self.get_Best_Member_Fitness()] = 1
+        # if fitness_history[self.get_Best_Member_Fitness()] > self.population_number:
+        #   print("\nRe-creating Population...")
+        #   fitness_history = dict()
+        #   self.create_Population(unique=True)
+
         self.calculate_Fitness_For_Population()
         if verbose:
           print(f"{i}. Crossover Best Fitness is {self.get_Best_Member_Fitness()}", end="\r")

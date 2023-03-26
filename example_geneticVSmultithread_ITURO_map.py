@@ -180,10 +180,10 @@ genetic_env = Genetic_Environment(
 start_time = time()
 # generation_count = genetic_env.crossover()
 best_member, generation_count = genetic_env.autorun(
-    minimum_fitness=int(len(gene_pool) * 0.9), 
+    minimum_fitness=int(len(gene_pool) * 0.7), 
     unique=True, 
     best_percentage=0.1, 
-    evolve_probability=0.5, 
+    evolve_probability=0.1, 
     verbose=True
 )
 end_time = time()
@@ -232,7 +232,7 @@ path_checker_result = container.optimize_Path(
 for step_node in path_checker_result:
     step_node.set_Marker(MARKERS.SQUARE)
 
-print("Find Path by Checker Result:")
+print("Find Path by Checker Result:\n")
 for step in path_checker_result:
     print(step.get_ID(), end=" > ")
 print("")

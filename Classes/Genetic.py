@@ -245,7 +245,7 @@ class Genetic_Environment():
       # fitness_history = dict()
       while self.get_Best_Member_Fitness() < minimum_fitness:
         self.crossover(
-            unique=unique,
+            unique=unique,o
             best_percentage=best_percentage, 
             evolve_probability=evolve_probability
         )

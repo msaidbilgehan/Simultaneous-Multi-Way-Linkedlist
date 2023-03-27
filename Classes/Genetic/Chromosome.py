@@ -57,11 +57,10 @@ class Chromosome():
     for i in range(len(self.genes) - 1):
       if target == self.genes[i]:
         target_gene_found = True
-        reward += 10
+        reward += 100
         break
       elif self.genes[i] is None:
-        reward -= 1
-        break
+        reward -= 10
       else:
         reward -= 1
       
@@ -85,7 +84,7 @@ class Chromosome():
         
     self.genes = genes
     
-  def fitness(self, target: Gene):
+  def fitness_reward(self, target: Gene):
     """
     Returns the fitness of the chromosome.
     """

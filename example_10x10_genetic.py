@@ -66,7 +66,7 @@ print(
 
 genetic_environment = Genetic_Environment(
     chromosome_length_limit=container.get_Node_Number(),
-    population_number=100
+    population_number=1000
 )
 genetic_environment.initialize_environment(
     input_gene=container.get_Input_Gate(),
@@ -74,7 +74,7 @@ genetic_environment.initialize_environment(
 )
 best_chromosome, best_fitness, is_found = genetic_environment.autorun(
     target=Gene(node_layer_list[-1][SEARCHED_NODE_INDEX]),
-    max_generations=100
+    max_generations=1000
 )
 print(f"Best Chromosome ({best_fitness}):", [gene.gene.get_ID() for gene in best_chromosome.get_Genes() if gene is not None])
 

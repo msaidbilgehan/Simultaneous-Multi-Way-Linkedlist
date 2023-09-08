@@ -1,6 +1,6 @@
 from time import time
 from Classes.Container import Container_Struct
-from Classes.Genetic import Genetic_Environment
+from Classes.Genetic.Genetic_Environment import Genetic_Environment
 
 NODE_ROW_LENGTH = 50
 NODE_COLUMN_LENGTH = 50

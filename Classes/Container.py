@@ -1,5 +1,5 @@
 
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import Future, ThreadPoolExecutor
 from threading import Thread
 import sys
 from time import sleep
@@ -19,41 +19,42 @@ class Container_Struct(object):
 
     def __init__(self, max_workers: int | None = None, do_not_check_again: bool = True, is_point_cloud: bool = False, verbose: bool = False):
 
-        self.id = self.id_counter
-        self.is_verbose = verbose
-        self.__node_List = list()
+        self.id: int = self.id_counter
+        self.is_verbose: bool = verbose
+        self.__node_List: list[Node_Point_Cloud_Struct | Node_Struct] = list()
 
         if is_point_cloud:
-            self.input_Gate = Gate_Point_Cloud_Struct()
+            self.input_Gate: Gate_Point_Cloud_Struct | Gate_Struct = Gate_Point_Cloud_Struct()
             self.input_Gate.set_Marker(MARKERS.TRIANGLE_UP)
             self.input_Gate.set_Color(COLORS.GREEN)
-            self.output_Gate = Gate_Point_Cloud_Struct()
+            self.output_Gate: Gate_Point_Cloud_Struct | Gate_Struct = Gate_Point_Cloud_Struct()
             self.output_Gate.set_Marker(MARKERS.TRIANGLE_DOWN)
             self.output_Gate.set_Color(COLORS.RED)
         else:
-            self.input_Gate = Gate_Struct()
+            self.input_Gate: Gate_Point_Cloud_Struct | Gate_Struct = Gate_Struct()
             self.output_Gate = Gate_Struct()
         self.__node_List.append(self.input_Gate)
         self.__node_List.append(self.output_Gate)
 
-        self.__node_array_map = list()
-        self.__node_id_array_map = list()
+        self.__node_array_map: list[list[Node_Point_Cloud_Struct | Node_Struct]] = list(
+        )
+        self.__node_id_array_map: list[list[int]] = list()
         
-        self.__search_History = Search_History_List_Struct()
-        self.__search_Data_List = list()
-        self.__found_Node_List = list()
-        self.__result_thread_list = list()
-        self.__waiting_Node_Cache = list()
+        self.__search_History: Search_History_List_Struct = Search_History_List_Struct()
+        self.__search_Data_List: list = list()
+        self.__found_Node_List: list[Node_Point_Cloud_Struct | Node_Struct] = list()
+        self.__result_thread_list: list[Future] = list()
+        self.__waiting_Node_Cache: list[dict[str, Node_Point_Cloud_Struct | Node_Struct]] = list()
         
-        self.__max_Workers = max_workers
-        self.__search_Thread_Active = True
-        self.do_not_check_again = do_not_check_again
+        self.__max_Workers: int | None = max_workers
+        self.__search_Thread_Active: bool = True
+        self.do_not_check_again: bool = do_not_check_again
 
-        self.is_Searched_All_Nodes = False
-        self.is_Received_All_Results = False
+        self.is_Searched_All_Nodes: bool = False
+        self.is_Received_All_Results: bool = False
         
-        self.__search_Producer_Thread = None
-        self.__search_Task_Consumer_Thread = None
+        self.__search_Producer_Thread: Thread
+        self.__search_Task_Consumer_Thread: Thread
 
     # https://stackoverflow.com/questions/674304/why-is-init-always-called-after-new
     def __new__(cls, max_workers: int | None = None, do_not_check_again: bool = True, is_point_cloud: bool = False, verbose: bool = False, *args, **kwargs):
@@ -62,7 +63,7 @@ class Container_Struct(object):
         Container_Struct.id_counter += 1
         return super(Container_Struct, cls).__new__(cls, *args, **kwargs)
     
-    def set_Max_Workers(self, max_Workers):
+    def set_Max_Workers(self, max_Workers: int | None):
         self.__max_Workers = max_Workers
         self.restart_Search_Thread()
         
@@ -84,10 +85,11 @@ class Container_Struct(object):
     def get_Max_Workers(self):
         return self.__max_Workers
     
-    def create_Node(self, number=1, is_point_cloud = False) -> list:
-        node_list = list()
+    def create_Node(self, number:int=1, is_point_cloud:bool=False) -> list[Node_Point_Cloud_Struct | Node_Struct]:
+        node_list: list = list()
         for _ in range(number):
-            node = Node_Point_Cloud_Struct() if is_point_cloud else Node_Struct()
+            node: Node_Point_Cloud_Struct | Node_Struct = Node_Point_Cloud_Struct(
+            ) if is_point_cloud else Node_Struct()
             node_list.append(node)
         self.__node_List += node_list
         return node_list
@@ -199,7 +201,7 @@ class Container_Struct(object):
             raise Exception("Node number must be greater than 2")
             return 0
 
-    def create_Node_Map(self, node_layers):
+    def create_Node_Map(self, node_layers: list[list[Node_Point_Cloud_Struct | Node_Struct]]):
         self.__node_array_map.append([self.input_Gate])
         for node_layer in node_layers:
             self.__node_array_map.append(node_layer)
@@ -212,22 +214,22 @@ class Container_Struct(object):
                 [node.get_ID() for node in node_layer])
         self.__node_id_array_map.append([self.output_Gate.get_ID()])
 
-    def get_Node_Map(self):
+    def get_Node_Map(self) -> list[list[Node_Point_Cloud_Struct | Node_Struct]]:
         return self.__node_array_map
 
-    def get_Node_ID_Map(self):
+    def get_Node_ID_Map(self) -> list[list[int]]:
         return self.__node_id_array_map
 
-    def get_Input_Gate(self) -> Gate_Struct or Gate_Point_Cloud_Struct:
+    def get_Input_Gate(self) -> Gate_Struct | Gate_Point_Cloud_Struct:
         return self.input_Gate
     
-    def get_Output_Gate(self) -> Gate_Struct or Gate_Point_Cloud_Struct:
+    def get_Output_Gate(self) -> Gate_Struct | Gate_Point_Cloud_Struct:
         return self.output_Gate
 
-    def get_Node_List(self) -> list:
+    def get_Node_List(self) -> list[Node_Point_Cloud_Struct | Node_Struct]:
         return self.__node_List
 
-    def get_Struct(self) -> tuple:
+    def get_Struct(self) -> tuple[list[Node_Point_Cloud_Struct | Node_Struct], Gate_Struct | Gate_Point_Cloud_Struct, Gate_Struct | Gate_Point_Cloud_Struct]:
         return self.get_Node_List(), self.get_Input_Gate(), self.get_Output_Gate()
 
     def get_Node_Number(self) -> int:
@@ -239,7 +241,7 @@ class Container_Struct(object):
             connection += len(node.get_Connected_Node_List())
         return connection
 
-    def get_Blocked_Node_Number(self):
+    def get_Blocked_Node_Number(self) -> int:
         blocked_Node_Number = 0
         for node in self.__node_List:
             if node.get_Blocked_Status():
@@ -253,10 +255,10 @@ class Container_Struct(object):
     def __set_search_Thread_Active(self, bool: bool):
         self.__search_Thread_Active = bool
         
-    def __get_search_Thread_Active(self):
+    def __get_search_Thread_Active(self) -> bool:
         return self.__search_Thread_Active
 
-    def __search_Task_Producer(self, waiting_node_cache):
+    def __search_Task_Producer(self, waiting_node_cache: list[dict[str, Node_Point_Cloud_Struct | Node_Struct]]):
         __total_Checked_Node = 0
 
         while self.__search_Thread_Active:
@@ -375,7 +377,7 @@ class Container_Struct(object):
 
     def search_Task(self, data:list, wait_until_k_number_found:int=-1, do_not_check_again:bool=True):
         self.__search_Data_List = data
-        self.__found_Node_List = list()
+        self.__found_Node_List: list[Node_Point_Cloud_Struct | Node_Struct] = list()
         self.set_Do_Not_Check_Again(do_not_check_again)
         
         self.__set_search_Thread_Active(True)
@@ -481,7 +483,7 @@ class Container_Struct(object):
             start_y += y_step
             start_z += z_step
     
-    def plot3D(self, draw_connections=True, draw_labels=True, save_gif=False, num_steps=100):
+    def plot3D(self, draw_connections: bool = True, draw_labels: bool = True, save_gif: bool = False, num_steps: int=100):
 
         def walk(start_pos=(0, 0, 0), end_pos=(0, 0, 0), num_steps=100):
             steps = np.linspace(start_pos, end_pos, num_steps)
@@ -498,6 +500,10 @@ class Container_Struct(object):
             return lines
 
         # https://medium.com/swlh/python-data-visualization-with-matplotlib-for-absolute-beginner-part-iii-three-dimensional-8284df93dfab
+
+        # TODO: Type Check
+        # if not all(isinstance(n, Node_Point_Cloud_Struct) for n in self.__node_List): # Node_Point_Cloud_Struct | Node_Struct
+        #     raise Exception("List contains invalid node type!")
 
         nodes_ID_information = [node.get_ID() for node in self.__node_List]
         nodes_3D_information = [node.get_Information_3D() for node in self.__node_List]
@@ -595,7 +601,7 @@ class Container_Struct(object):
             plt.savefig('3D_Node_Map.png')
 
     @staticmethod
-    def optimize_Path(path: list, target: Node_Point_Cloud_Struct or Node_Struct) -> list:
+    def optimize_Path(path: list[Node_Point_Cloud_Struct | Node_Struct], target: Node_Point_Cloud_Struct | Node_Struct) -> list[Node_Point_Cloud_Struct | Node_Struct]:
         # print(f"Before Path ({len(path)}):", [node.get_ID() for node in path])
 
         original_path = path.copy()
@@ -653,8 +659,8 @@ class Container_Struct(object):
             return [input_Gate]
 
     @staticmethod
-    def find_Path_By_Checker_Node(node, input_Gate) -> list:
-        path = list()
+    def find_Path_By_Checker_Node(node, input_Gate: Node_Struct | Node_Point_Cloud_Struct) -> list[Node_Struct | Node_Point_Cloud_Struct]:
+        path: list[Node_Struct | Node_Point_Cloud_Struct] = list()
         current_Node = node
         
         while True:

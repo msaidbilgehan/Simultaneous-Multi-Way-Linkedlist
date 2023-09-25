@@ -4,6 +4,7 @@
 
 from concurrent.futures import ThreadPoolExecutor
 from threading import Lock
+from typing import Any
 # from time import sleep
 # from multiprocessing import cpu_count
 
@@ -11,7 +12,7 @@ class Node_Struct(object):
     id_Counter = 0
     # thread_Limit = cpu_count() * 100
 
-    def __init__(self, data=None, connections=None, is_Node_Blocked=False):
+    def __init__(self, data: Any = None, connections: list | None = None, is_Node_Blocked: bool=False):
 
         # Self Checker
         if connections is not None:
@@ -19,11 +20,11 @@ class Node_Struct(object):
                 raise Exception("Node can't be connected to itself")
 
             # Node Position
-            self.connected_Node_List = connections
+            self.connected_Node_List: list = connections
         else:
-            self.connected_Node_List = list()
+            self.connected_Node_List: list = list()
         
-        self.__data = data
+        self.__data: Any = data
         self.__is_Data_Checked = False
         self.checked_by = None
         

@@ -1,16 +1,16 @@
-from random import randint, seed
 from time import time
 from Classes.Container import Container_Struct
+import secrets
 
 print("")
 print("=== Initialize ===")
 NUMBER_OF_MAX_WORKERS = 10000
 
-seed(time())
+secrets.SystemRandom().seed(time())
 SEARCHED_DATA = -13  # randint(0, 100)
 NODE_COLUMN_LENGTH = 4  # randint(0, 10000) or cpu_count() * 100
 NODE_ROW_LENGTH = 4  # randint(0, 10000) or cpu_count() * 100
-SEARCHED_NODE_INDEX = NODE_COLUMN_LENGTH - randint(1, NODE_COLUMN_LENGTH-1)
+SEARCHED_NODE_INDEX = NODE_COLUMN_LENGTH - secrets.SystemRandom().randint(1, NODE_COLUMN_LENGTH-1)
 
 # Create a container
 container = Container_Struct(NUMBER_OF_MAX_WORKERS, verbose=False)

@@ -1,14 +1,15 @@
-from random import randint, seed
+from random import randint
 from time import time
 from Classes.Container import Container_Struct
 import matplotlib.pyplot as plt
 import numpy as np
+import secrets
 
 print("")
 print("=== Initialize ===")
 NUMBER_OF_MAX_WORKERS = 10000
 
-seed(time())
+secrets.SystemRandom().seed(time())
 SEARCHED_DATA = -13 
 NODE_ROW_LENGTH = 25  
 

@@ -1,5 +1,4 @@
 from copy import copy
-import random
 import time
 from typing import Union
 from Classes import Node
@@ -8,6 +7,7 @@ from Classes.Node_PC import Node_Point_Cloud_Struct
 from Classes.Gate import Gate_Struct, Gate_Point_Cloud_Struct
 from Classes.Genetic.Gene import Gene
 from Classes.Genetic.Chromosome import Chromosome
+import secrets
 
 class Genetic_Environment():
     def __init__(
@@ -145,18 +145,18 @@ class Genetic_Environment():
       
       # Add the rest of the members to the next generation
       while len(self.next_generation) < self.population_number:
-        parent_chromosome_1 = random.choice(best_members)
-        parent_chromosome_2 = random.choice(best_members)
+        parent_chromosome_1 = secrets.SystemRandom().choice(best_members)
+        parent_chromosome_2 = secrets.SystemRandom().choice(best_members)
 
         # if parent_chromosome_1.genes is [None] or parent_chromosome_2.genes is [None]:
         #   raise Exception("Parent chromosome is None!")
 
-        random.seed(time.time())
-        step_evolve_probability = random.random()
+        secrets.SystemRandom().seed(time.time())
+        step_evolve_probability = secrets.SystemRandom().random()
         if step_evolve_probability < evolve_probability:
-            random.seed(time.time())
+            secrets.SystemRandom().seed(time.time())
             parent_chromosome_evolved = copy(
-              parent_chromosome_1 if random.randint(0, 1) else
+              parent_chromosome_1 if secrets.SystemRandom().randint(0, 1) else
               parent_chromosome_2
             )
             self.next_generation.append(parent_chromosome_evolved)
@@ -182,12 +182,12 @@ class Genetic_Environment():
     def crossover(self, parent_chromosome_1, parent_chromosome_2):
       child_genes = list()
       for i in range(self.chromosome_length_limit):
-        random.seed(time.time())
+        secrets.SystemRandom().seed(time.time())
         if i == 0:
           child_genes.append(parent_chromosome_1.get_Gene(i))
           continue
         else:
-          if random.randint(0, 1):
+          if secrets.SystemRandom().randint(0, 1):
             crossover_gene = parent_chromosome_1.get_Gene(i)
           else:
             crossover_gene = parent_chromosome_2.get_Gene(i)

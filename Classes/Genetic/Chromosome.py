@@ -1,6 +1,6 @@
-import random
 from typing import Union
 from Classes.Genetic.Gene import Gene
+import secrets
 
 class Chromosome():
   def __init__(self, genes: list[Gene]):
@@ -16,7 +16,7 @@ class Chromosome():
     return len(self.genes)
   
   def get_Random_Gene(self):
-    return random.choice(self.genes)
+    return secrets.SystemRandom().choice(self.genes)
   
   def get_Latest_Gene(self):
     # Iterate over the chromosome backwards

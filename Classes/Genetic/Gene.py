@@ -1,9 +1,9 @@
-import random
 from typing import Self
 from typing import Union
 from Classes.Node import Node_Struct
 from Classes.Node_PC import Node_Point_Cloud_Struct
 from Classes.Gate import Gate_Struct, Gate_Point_Cloud_Struct
+import secrets
 
 class Gene():
   def __init__(self, gene: Union[Node_Struct, Node_Point_Cloud_Struct, Gate_Struct, Gate_Point_Cloud_Struct]):
@@ -31,7 +31,7 @@ class Gene():
   def get_Random_Connected_Gene(self) -> Self:
     if len(self.gene.get_Connected_Node_List()) == 0:
       return self
-    return Gene(random.choice(self.gene.get_Connected_Node_List()))
+    return Gene(secrets.SystemRandom().choice(self.gene.get_Connected_Node_List()))
   
   def evolve(self) -> Self:
     return self.get_Random_Connected_Gene()

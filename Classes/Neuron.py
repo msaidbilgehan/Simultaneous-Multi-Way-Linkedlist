@@ -8,7 +8,8 @@ import threading
 class Node_Struct(object):
     id_counter = 0
 
-    def __init__(self, data=None, connections=list(), is_Node_Blocked=False, task_Sleep_Time=0):
+    def __init__(self, data=None, connections=None, is_Node_Blocked=False, task_Sleep_Time=0):
+        connections = [] if connections is None else connections
 
         # Self Checker
         if self in connections:
